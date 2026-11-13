@@ -96,3 +96,36 @@ Regresión tras la corrección: `round_logic.sql` dio **53 checks, 0 fallos** (i
 Con un evento y una regla aportando el mismo tema, `active_themes` salía `["navidad","navidad"]`. La migración `20261113000500_distinct_active_themes.sql` lo devuelve sin duplicados (`["navidad"]`). Verificado con una consulta de solo lectura; no requirió repetir el test.
 
 Captura: _(pega aquí tu captura del seed en Supabase, tabla `songs`)_
+
+## Núcleo del cliente (Fase 4)
+
+### Prueba de humo contra Supabase real
+
+`npm run smoke` ([`scripts/smoke-client.mjs`](../scripts/smoke-client.mjs)) hace lo mismo que el navegador, con la clave publicable del `.env`. No crea rondas ni modifica datos.
+
+| Comprobación | Resultado |
+|---|---|
+| Sign-in anónimo | OK |
+| Lee `settings`, `songs` (39) y `playback_state` | OK |
+| NO lee `context_rules` ni `play_history` (solo admin) | OK |
+| RPC `server_now` (desfase ~57 ms, latencia ~146 ms) | OK |
+| RPC `is_admin` = false para un anónimo | OK |
+| RPC `cast_vote` con ronda inexistente → `not_found` | OK |
+| Insert directo en `songs` bloqueado (`42501`) | OK |
+| Update directo en `settings` bloqueado (0 filas) | OK |
+| Insert directo en `votes` bloqueado (`permission denied`) | OK |
+| Realtime `SUBSCRIBED` | OK |
+
+Resultado: **13 de 13 comprobaciones**, `Todo bien`.
+
+### Hooks base en un navegador real
+
+Página solo de desarrollo `/diagnostico` (no existe en producción), probada con Playwright:
+
+- Sesión anónima creada y **reutilizada tras recargar** (mismo `uid`, no se crea un usuario por recarga).
+- Reloj del servidor sincronizado (desfase ~56 ms, latencia ~128 ms) y cuenta regresiva de 20 s bajando.
+- Realtime `connected`; al simular `offline` pasa a `error` y al volver `online` regresa a `connected`.
+- Ajustes, estado de reproducción y anuncios cargados desde la base. Consola sin errores ni advertencias.
+- `npm run build` y `npm run lint` sin errores ni advertencias.
+
+Captura: _(pega aquí una captura de `/diagnostico`)_

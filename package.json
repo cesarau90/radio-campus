@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "verify:seed": "node scripts/verify-youtube-ids.mjs",
+    "smoke": "node scripts/smoke-client.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
