@@ -51,6 +51,48 @@ Cómo correrla: pegar el archivo completo en el SQL Editor. Crea fixtures `TEST_
 
 **Resultado (ejecutado el 2026-11-13 en el proyecto "radio", SQL Editor):** `RESUMEN: true — 51 checks, 0 fallos`.
 
+> **Actualización (Fase 3):** la migración `20261113000400_theme_eligibility.sql` cambió `_contextual_pick` (ver Fase 3) y el test ganó dos casos (A10 y A11), por lo que el total esperado pasó de 51 a **53 verificaciones**. **Resultado de la nueva corrida (2026-11-13, SQL Editor): `RESUMEN: true — 53 checks, 0 fallos`**, incluidos A10 y A11.
+
 Nota: en la primera ejecución C/D y E fallaron por un error del propio test (`format('%s', boolean)` produce `t`/`f`, JSON inválido). Se corrigió el test con un cast a `text`; las funciones SQL no cambiaron.
 
 Captura: _(pega aquí tu captura del resultado)_
+
+## Datos de ejemplo (Fase 3)
+
+### Verificación de los IDs de YouTube
+
+Ningún ID se inventó. Cada `youtube_id` del seed se verificó contra oEmbed
+(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=ID&format=json`):
+
+- Respuesta **HTTP 200** (el video existe y permite embed).
+- El **título real** devuelto por YouTube contiene el nombre de la canción esperada (descarta IDs que apunten a otro video).
+- `playableInEmbed = true` y duración real (`duration_sec`) leída del video.
+- Candidatos descartados: 1 con HTTP 404; "Moonlight Sonata (FULL)" por durar 900 s.
+
+Resultado: **39 canciones** (pop 8, rock 5, electrónica 5, instrumental 7, regional mexicano 8, navideñas 6).
+No hay lo-fi: no se encontraron pistas individuales (solo mixes largos y transmisiones en vivo, que no tienen duración).
+
+Para volver a comprobarlo (por ejemplo antes de la demo): `npm run verify:seed`. Última corrida: `39/39 videos disponibles para embed`.
+
+### El algoritmo con las canciones reales
+
+Consultas de solo lectura a `_contextual_pick` (300 sorteos por contexto, sin escribir nada):
+
+| Contexto | Reglas que aplican | Qué se ofrece |
+|---|---|---|
+| 9 h, 25 °C | Mañana (energía 2-3) | electrónica, instrumental, pop, regional |
+| 13 h, 35 °C | Calor + Mediodía | electrónica, pop, regional, rock, con moods frescos/alegres |
+| 21 h, 12 °C | Frío + Tarde y noche | instrumental, pop, regional, con moods acogedores |
+| Exámenes, 13 h | Exámenes (100) manda sobre Calor y Mediodía | solo instrumentales de energía 1-2 |
+| Festividad (con o sin tema en el evento) | Festividad (90) | solo navideñas (600 de 600 opciones) |
+| Sin temperatura | — | playlist "respaldo" |
+
+**Defecto encontrado con datos reales y corregido:** al principio se ofrecían navideñas (por ejemplo *Last Christmas* a las 3 am) fuera de temporada, porque el tema solo actuaba como filtro suave cuando había una regla o evento con ese tema. La migración `20261113000400_theme_eligibility.sql` hace que una canción con `theme` solo sea elegible si ese tema está activo (tema del evento o de una regla que aplica). Resultado después de corregir: **0 navideñas ofrecidas fuera de temporada en 3 000 opciones sorteadas**.
+
+Regresión tras la corrección: `round_logic.sql` dio **53 checks, 0 fallos** (incluye A10 y A11, que cubren este defecto).
+
+### Detalle menor: tema duplicado en el snapshot
+
+Con un evento y una regla aportando el mismo tema, `active_themes` salía `["navidad","navidad"]`. La migración `20261113000500_distinct_active_themes.sql` lo devuelve sin duplicados (`["navidad"]`). Verificado con una consulta de solo lectura; no requirió repetir el test.
+
+Captura: _(pega aquí tu captura del seed en Supabase, tabla `songs`)_

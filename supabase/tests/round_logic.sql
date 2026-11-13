@@ -106,6 +106,8 @@ begin
     values ('TEST_calor', 10, 30, '{alegre}');
   insert into public.context_rules (name, priority, event_type, allowed_genres)
     values ('TEST_vacio', 300, 'evento', '{noexiste}');
+  insert into public.context_rules (name, priority, event_type, themes)
+    values ('TEST_fest', 90, 'festividad', '{navidad}');
 
   update public.settings set round_duration_sec = 30, max_play_sec = 0, tie_rule = 'aleatorio',
     no_votes_rule = 'aleatorio', no_repeat_minutes = 60, context_override = null, paused = false where id = 1;
@@ -191,6 +193,23 @@ begin
         and (select bool_and(sg.genre = 'pop') from public.songs sg where sg.id in (rd.option_a, rd.option_b)),
       rd.context_snapshot::text);
     perform pg_temp.clear_rounds();
+
+    -- Migración 20261113000400: las canciones con tema solo se ofrecen si ese tema está activo.
+    stp := 'A10 canciones con tema fuera de temporada';
+    update public.settings set context_override = '{"event_type":"ninguno","temp":25,"hour":10}' where id = 1;
+    k := 0;
+    for kk in 1..40 loop
+      snap := public._contextual_pick(public._build_context(null));
+      if (snap ->> 'a')::uuid in (n1, n2) or (snap ->> 'b')::uuid in (n1, n2) then k := k + 1; end if;
+    end loop;
+    perform pg_temp.chk('A10 sin evento ni regla de tema: las canciones con tema no se ofrecen (40 sorteos)',
+      k = 0, 'apariciones=' || k);
+
+    stp := 'A11 festividad sin tema en el evento';
+    update public.settings set context_override = '{"event_type":"festividad","temp":25,"hour":10}' where id = 1;
+    snap := public._contextual_pick(public._build_context(null));
+    perform pg_temp.chk('A11 festividad sin tema en el evento: la regla (themes navidad) habilita las navideñas',
+      (snap ->> 'a')::uuid in (n1, n2) and (snap ->> 'b')::uuid in (n1, n2), snap::text);
   exception when others then
     get stacked diagnostics ctx = pg_exception_context;
     perform pg_temp.chk('A (error inesperado)', false,

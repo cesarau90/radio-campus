@@ -13,7 +13,7 @@
 ## Global Constraints
 - Toda la lógica en `src/hooks`; componentes solo reciben props; cada página llama a su hook principal una sola vez.
 - Tipos en `src/types` con barrel `index.ts`.
-- Claves solo en `.env` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`); incluir `.env.example` y `.gitignore`.
+- Claves solo en `.env` (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`; el usuario pidió la clave publicable `sb_publishable_…` en lugar de la anon key); incluir `.env.example` y `.gitignore`.
 - Sin servidor Node propio, workers ni TTS local. Todo gratuito.
 - Voz: `speechSynthesis`, `es-MX`. Clima: Open-Meteo (coords de Tampico en settings). Zona horaria: `America/Mexico_City`.
 - UI: skills diseno-distintivo + impeccable + guías de animación de Emil Kowalski. Nada de diseño genérico de IA.
