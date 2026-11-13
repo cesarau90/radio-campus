@@ -1,0 +1,2 @@
+# Saltos de línea LF en todo el repositorio (evita avisos LF/CRLF entre Windows y Linux/Vercel).
+* text=auto eol=lf
