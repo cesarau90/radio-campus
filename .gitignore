@@ -29,3 +29,4 @@ dist-ssr
 
 # Artefactos de pruebas con Playwright
 .playwright-mcp
+.vercel
