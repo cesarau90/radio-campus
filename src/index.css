@@ -54,7 +54,28 @@
 html,
 body,
 #root {
-  height: 100%;
+  min-height: 100%;
+}
+
+/* ---- base para celular (se siente instalada, no "una página web") ---- */
+html {
+  -webkit-tap-highlight-color: transparent; /* sin destello gris al tocar; cada control trae su :active */
+  -webkit-text-size-adjust: 100%; /* sin inflar la letra al girar */
+  overscroll-behavior: none; /* sin pull-to-refresh ni rebote de toda la página */
+}
+input,
+textarea,
+select {
+  font-size: 16px; /* menos de 16px hace que iOS haga zoom al enfocar */
+}
+button,
+a,
+[role='button'] {
+  touch-action: manipulation; /* sin retraso de 300 ms por doble toque */
+}
+button {
+  user-select: none;
+  -webkit-user-select: none;
 }
 
 body {

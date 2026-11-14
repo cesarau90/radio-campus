@@ -1,5 +1,7 @@
-import Placeholder from '../components/Placeholder'
+import VotarView from '../components/VotarView'
+import { useVotar } from '../hooks/useVotar'
 
 export default function Votar() {
-  return <Placeholder route="/votar" phase={5} />
+  const votar = useVotar()
+  return <VotarView {...votar} />
 }
