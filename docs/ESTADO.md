@@ -24,7 +24,26 @@
 | 8 `/admin` operación | pendiente | |
 | 9 Pulido y documentación | pendiente | |
 
-## Fase 6 (`/pantalla`): en curso (2026-11-17)
+## Fase 7 (`/admin` CRUDs): implementada, sin commit (2026-11-17)
+
+- **Commit pendiente:** Fase 6 está en `main` (`47b89f9`, desplegada; `/pantalla` carga en producción con la URL de Vercel en el QR). **Este ESTADO.md va junto con la Fase 7**, no por separado (decisión del usuario).
+- **Limpieza de datos de prueba de `/pantalla`: pendiente, se hace antes de la ronda con celulares.** Abrir `/pantalla` (también en producción) escribe en la base real (`rounds`, `play_history`, `playback_state`). Los ids de `play_history` solo los lee el admin; se limpia por rango de hora o con los ids que muestre un `select` previo.
+- **Qué hay:** `useAdmin` (hook principal: sesión + pestaña + una sección por hook), `api.ts` con las escrituras (RLS: solo `is_admin()`), `AdminView` con login y 4 pestañas.
+  - **Canciones** (`useAdminSongs`, `SongsPanel`): búsqueda y filtros (todas/activas/inactivas/restringidas), alta con enlace o ID → "Comprobar en YouTube" (oEmbed 200 + título/canal + duración con el reproductor oculto `getDuration()`), editar, activar/desactivar, restringir con motivo, borrar con confirmación (si ya salió en una ronda, avisa y sugiere desactivarla).
+  - **Eventos y temas** (`useAdminEvents`, `EventsPanel`): nombre, tipo, fechas (hora del campus), tema; estado vigente/próximo/terminado y aviso de cuántas canciones usan el tema.
+  - **Anuncios** (`useAdminAnnouncements`, `AnnouncementsPanel`): texto (≤ 280), aprobado y activo (lo único que lee `/pantalla`), fechas, horario, cada N canciones, "Probar voz", borrar.
+  - **Configuración** (`useAdminSettings`, `SettingsForm`): `round_duration_sec` (≥ 10), `max_play_sec` (0 = completa), `no_repeat_minutes`, empate, sin votos, pausa y coordenadas, con las mismas validaciones que los `check` de la tabla.
+- **Verificado con Playwright en vivo (2026-11-17, sesión de admin real, todo marcado "PRUEBA", capturas a 1366×768 en `docs/evidencias/fase7/`; el login está en `admin-login-1366x768.png`):**
+  - **Canciones:** "Comprobar en YouTube" rellenó título, canal y duración (214 s); alta, edición (energía y ánimo) y desactivación funcionan (`admin-canciones-*.png`).
+  - **Eventos:** alta con tema, aviso "Ninguna canción tiene este tema todavía", validación de fechas (el botón se deshabilita), estado "Próximo" (`admin-eventos-*.png`).
+  - **Anuncios:** Sin aprobar → Sale al aire → Apagado. Con un cliente anónimo (como `/pantalla`) el anuncio solo se vio aprobado **y** activo (0 → 1 → 0) (`admin-anuncios-*.png`).
+  - **Configuración (criterio de aceptación):** `no_repeat_minutes` 20 → 27, guardado, **recargado y persiste** (`admin-config-antes/guardado/recargado-*.png`); un valor inválido deshabilita Guardar; se restauró a 20 y se confirmó tras otra recarga (resto intacto: 30 / 0 / 22.2331 / -97.8611).
+  - No se probó el botón "Borrar" de la interfaz (la limpieza se hace por SQL por id).
+- **Datos de PRUEBA que quedan en la base (limpiar por id):** canción `f62849f9-f806-44ea-bdcc-f2fa61d5c447` (inactiva), evento `5da886aa-a4ad-4a00-9c14-5c60b4d50858` (marzo 2027), anuncio `5bcd7b4c-12c6-45b7-baeb-7c933aa3f5f5` (sin aprobar y apagado).
+- **Admin de pruebas:** `admin@radiocampus.test` (creado por el usuario; está en `admins`).
+- **Decisiones:** las fechas de eventos/anuncios se escriben en la hora del navegador y se muestran en la del campus (`America/Mexico_City`); `context_override` y `skip_requested_at` quedan para la Fase 8 (operación).
+
+## Fase 6 (`/pantalla`): hecha y desplegada (2026-11-17)
 
 Bloques: 1 núcleo (hecho, sin commit) · 2 YouTube (`useYouTubePlayer`, corte a `max_play_sec` con fade-out, errores a respaldo, pausa/salto) · 3 voz (`useSpeech`, es-MX) · 4 clima + ticker (`useWeather`, temperatura a `start_round`) · 5 cierre (conexión, recarga, capturas, build + lint).
 
@@ -130,7 +149,18 @@ Notas de la sesión: el servidor de desarrollo local (puerto 5199) quedó deteni
 2. **Rediseño visual: hecho** (2026-11-14), falta cerrar sus pendientes y hacer el commit (ver "Pendientes del rediseño (próxima sesión)"). Decisiones: portadas derivadas de `youtube_id`, sin columna nueva; si una no carga se muestra un bloque con el título; las canciones `restricted` también tienen portada (es solo la miniatura pública).
 3. **Site URL de Vercel en Supabase** (Authentication → URL Configuration). Lo hace el usuario; anotar aquí cuando esté hecho.
 
+## Antes de la demo
+
+- **Aprobar el anuncio "Bienvenidos a Radio Campus"** desde `/admin` → Anuncios (hoy no sale al aire hasta que esté aprobado y activo).
+- **Poner "Máximo por canción" en 90** desde `/admin` → Configuración (hoy está en 0 = canción completa).
+- Limpiar los datos de prueba de `/pantalla` (`rounds`, `play_history`, `playback_state`) por id y subir el rate limit de sign-ins anónimos (ver abajo).
+
 ## Qué falta además
+
+- **Fase 9 — pulido de `/admin` (pedido por el usuario tras revisar las capturas de la Fase 7):**
+  - "Borrar" con estilo distinto (de peligro) y confirmación antes de borrar (hoy hay un "¿Sí, borrar?" en la fila; revisar que el botón de borrar ya se vea como acción destructiva desde el primer clic).
+  - Acciones de la tabla de canciones en un solo renglón.
+  - Configuración en 2 columnas en escritorio.
 
 - Opcional: `DESIGN.md` con el sistema visual (comando `document` de impeccable); encaja justo después del rediseño.
 - Pendiente conocido de `/votar` (ya en el plan, Fase 9): al recargar con voto ya emitido, la vista pasa un instante por "votar" hasta que llega `fetchMyVote`. Debe mostrar "Sintonizando…" hasta que resuelva.

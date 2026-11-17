@@ -84,6 +84,7 @@
   --card-max: 21rem; /* alto máximo de cada tarjeta en celular, para que no se estiren de más */
   --check-size: 1.75rem; /* círculo de selección */
   --cover-lg: 5.5rem;
+  --admin-max: 72rem; /* ancho del panel /admin */
   --cover-xl: min(26rem, 52vh); /* portada de "Sonando ahora" en /pantalla */
   --qr-size: 17.5rem; /* QR de /pantalla: 280 px mínimo, sobre papel claro con margen (quiet zone) */
   --qr-pad: 1.25rem;

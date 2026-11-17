@@ -5,6 +5,9 @@
 import { supabase } from './supabase'
 import type {
   Announcement,
+  AnnouncementInput,
+  CampusEvent,
+  CampusEventInput,
   PlaybackPhase,
   PlaybackState,
   PlayStatus,
@@ -12,6 +15,7 @@ import type {
   RoundOption,
   Settings,
   Song,
+  SongInput,
   VoteResult,
 } from '../types'
 
@@ -139,4 +143,58 @@ export async function fetchNextAnnouncement(): Promise<Announcement | null> {
 export async function markAnnouncementPlayed(id: string): Promise<void> {
   const res = await supabase.rpc('mark_announcement_played', { p_id: id })
   if (res.error) throw new Error(res.error.message)
+}
+
+// ---------- admin: escrituras (la base solo las deja si is_admin(); RLS) ----------
+
+/** Todas las canciones, también las restringidas e inactivas (RLS: el admin las ve todas). */
+export async function fetchAllSongs(): Promise<Song[]> {
+  return unwrap(await supabase.from('songs').select('*').order('title').returns<Song[]>())
+}
+
+export async function insertSong(input: SongInput): Promise<Song> {
+  return unwrap(await supabase.from('songs').insert(input).select().single<Song>())
+}
+
+export async function updateSong(id: string, patch: Partial<SongInput>): Promise<Song> {
+  return unwrap(await supabase.from('songs').update(patch).eq('id', id).select().single<Song>())
+}
+
+export async function deleteSong(id: string): Promise<void> {
+  const res = await supabase.from('songs').delete().eq('id', id)
+  if (res.error) throw new Error(res.error.message)
+}
+
+export async function fetchEvents(): Promise<CampusEvent[]> {
+  return unwrap(await supabase.from('events').select('*').order('starts_at', { ascending: false }).returns<CampusEvent[]>())
+}
+
+export async function insertEvent(input: CampusEventInput): Promise<CampusEvent> {
+  return unwrap(await supabase.from('events').insert(input).select().single<CampusEvent>())
+}
+
+export async function updateEvent(id: string, patch: Partial<CampusEventInput>): Promise<CampusEvent> {
+  return unwrap(await supabase.from('events').update(patch).eq('id', id).select().single<CampusEvent>())
+}
+
+export async function deleteEvent(id: string): Promise<void> {
+  const res = await supabase.from('events').delete().eq('id', id)
+  if (res.error) throw new Error(res.error.message)
+}
+
+export async function insertAnnouncement(input: AnnouncementInput): Promise<Announcement> {
+  return unwrap(await supabase.from('announcements').insert(input).select().single<Announcement>())
+}
+
+export async function updateAnnouncement(id: string, patch: Partial<AnnouncementInput>): Promise<Announcement> {
+  return unwrap(await supabase.from('announcements').update(patch).eq('id', id).select().single<Announcement>())
+}
+
+export async function deleteAnnouncement(id: string): Promise<void> {
+  const res = await supabase.from('announcements').delete().eq('id', id)
+  if (res.error) throw new Error(res.error.message)
+}
+
+export async function updateSettings(patch: Partial<Omit<Settings, 'id'>>): Promise<Settings> {
+  return unwrap(await supabase.from('settings').update(patch).eq('id', 1).select().single<Settings>())
 }

@@ -9,7 +9,8 @@ export type {
   FallbackReason,
 } from './round'
 export type { Settings, TieRule, NoVotesRule, ContextOverride } from './settings'
-export type { Announcement } from './announcement'
+export type { Announcement, AnnouncementInput } from './announcement'
+export type { CampusEvent, CampusEventInput, EventType } from './event'
 export type { ConnectionStatus } from './connection'
 export type { PlaybackState, PlaybackPhase, PlayStatus } from './playback'
 export type { VoteResult, VoteStatus } from './vote'

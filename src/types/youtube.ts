@@ -6,6 +6,7 @@ export interface YTPlayer {
   setVolume(volume: number): void
   unloadModule(name: string): void
   getPlayerState(): number
+  getDuration(): number
   destroy(): void
 }
 
@@ -15,6 +16,7 @@ export interface YTNamespace {
     options: {
       width?: string | number
       height?: string | number
+      videoId?: string
       playerVars?: Record<string, number | string>
       events?: {
         onReady?: (e: { target: YTPlayer }) => void

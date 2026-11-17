@@ -10,3 +10,6 @@ export interface Announcement {
   every_n_songs: number
   last_played_at: string | null
 }
+
+/** Lo que edita el admin; `id` y `last_played_at` los maneja la base. */
+export type AnnouncementInput = Omit<Announcement, 'id' | 'last_played_at'>

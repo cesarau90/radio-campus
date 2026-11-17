@@ -1,5 +1,7 @@
-import Placeholder from '../components/Placeholder'
+import AdminView from '../components/AdminView'
+import { useAdmin } from '../hooks/useAdmin'
 
 export default function Admin() {
-  return <Placeholder route="/admin" phase={7} />
+  const admin = useAdmin()
+  return <AdminView {...admin} />
 }
