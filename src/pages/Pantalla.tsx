@@ -1,5 +1,7 @@
-import Placeholder from '../components/Placeholder'
+import PantallaView from '../components/PantallaView'
+import { usePantalla } from '../hooks/usePantalla'
 
 export default function Pantalla() {
-  return <Placeholder route="/pantalla" phase={6} />
+  const pantalla = usePantalla()
+  return <PantallaView {...pantalla} />
 }

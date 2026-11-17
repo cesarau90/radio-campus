@@ -1,0 +1,601 @@
+/*
+  /pantalla (TV del campus). Solo tokens (src/styles/tokens.css); portada, EN VIVO y marca vienen de radio.css y votar.css.
+  Pensada para 1920×1080 a varios metros: letra grande, sin scroll, nada de interacción.
+*/
+
+.pt-app {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-8) var(--space-10);
+  color: var(--color-text);
+}
+/* Fondo: el mismo estudio de radio que /votar, con su capa oscura. */
+.pt-app::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(color-mix(in srgb, var(--color-bg) var(--backdrop-shade), transparent), color-mix(in srgb, var(--color-bg) var(--backdrop-shade), transparent)),
+    var(--backdrop-image) center / cover no-repeat;
+}
+
+.pt-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.pt-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--step-2);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.pt-brand svg {
+  color: var(--color-signal);
+}
+
+/* ---------- escenario: sonando ahora | votación ---------- */
+.pt-stage {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-8);
+  min-height: 0;
+}
+.pt-now,
+.pt-side {
+  min-width: 0;
+  border: var(--border) solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-bg) var(--panel-shade), transparent);
+}
+.pt-now {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-8);
+  text-align: center;
+  container-type: inline-size; /* cqw = ancho útil del panel (para acotar el alto del video) */
+}
+/* Ancho completo del panel y, como mínimo, 16:9. Si sobra altura crece hasta 4:3 (el video se recorta de los lados). */
+.pt-now-cover {
+  position: relative;
+  display: block;
+  width: 100%;
+  flex: 1 1 0;
+  min-height: calc(100cqw * 9 / 16);
+  max-height: calc(100cqw * 3 / 4);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: var(--border-strong) solid var(--color-line);
+  container-type: size;
+}
+/* El video cubre el recuadro (como object-fit: cover) y solo se ve cuando ya está sonando;
+   si no carga, queda la portada de abajo. Sin eventos de puntero: el hover no muestra la interfaz de YouTube. */
+.pt-player {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: max(100cqw, 100cqh * 16 / 9);
+  height: max(100cqh, 100cqw * 9 / 16);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  pointer-events: none;
+}
+.pt-player.is-live {
+  opacity: 1;
+}
+.pt-player iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
+}
+/* La portada de respaldo también cubre el recuadro; se acerca un poco para recortar las barras negras de hqdefault. */
+.pt-now-cover .cover-img {
+  transform: scale(1.15);
+}
+.pt-unlock {
+  pointer-events: auto; /* el botón sí recibe clics aunque el video no */
+  position: absolute;
+  inset-inline: var(--space-4);
+  bottom: var(--space-4);
+  min-height: var(--tap-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-signal-deep);
+  color: var(--color-on-signal-deep);
+  font: inherit;
+  font-size: var(--step-0);
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}
+/* hqdefault trae barras negras arriba y abajo: en el recuadro 16:9 object-fit: cover ya las recorta;
+   en las miniaturas cuadradas se acerca para recortarlas */
+.pt-opt-cover .cover-img {
+  transform: scale(var(--cover-zoom-square));
+}
+.pt-now-label {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-signal);
+}
+.pt-now-title {
+  margin: 0;
+  max-width: 100%;
+  font-size: var(--step-3);
+  font-weight: var(--weight-bold);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+.pt-now-artist {
+  margin: 0;
+  font-size: var(--step-1);
+  color: var(--color-text-muted);
+}
+.pt-song-bar {
+  width: 100%;
+  max-width: 36rem;
+  height: var(--progress-h);
+  margin-top: var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  overflow: hidden;
+}
+.pt-song-fill {
+  display: block;
+  height: 100%;
+  background: var(--color-signal);
+  transform-origin: left center;
+  transition: transform 1s linear;
+}
+.pt-song-left {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+.pt-dial {
+  display: grid;
+  place-items: center;
+  width: var(--dial-size);
+  aspect-ratio: 1;
+  border: var(--border-strong) solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-signal);
+}
+
+/* ---------- columna de votación ---------- */
+.pt-side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-8);
+}
+.pt-heading {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--weight-regular); /* DM Serif Display solo existe en 400 */
+  font-size: var(--step-3);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+.pt-timer-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+.pt-timer-label {
+  font-size: var(--step-0);
+  color: var(--color-text-muted);
+}
+.pt-count {
+  font-size: var(--step-3);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  color: var(--color-signal);
+}
+.pt-count.is-urgent {
+  color: var(--color-text);
+  animation: pt-urgent var(--dur-pulse) ease-in-out infinite;
+}
+@keyframes pt-urgent {
+  50% {
+    opacity: 0.55;
+  }
+}
+.pt-progress {
+  display: block;
+  height: var(--progress-h);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  overflow: hidden;
+}
+.pt-progress-bar {
+  display: block;
+  height: 100%;
+  background: var(--color-signal);
+  transform-origin: left center;
+  transition: transform 250ms linear;
+}
+.pt-next {
+  margin: 0;
+  font-size: var(--step-1);
+  color: var(--color-text-muted);
+}
+.pt-next strong {
+  color: var(--color-text);
+}
+.pt-note {
+  margin: 0;
+  font-size: var(--step-0);
+  color: var(--color-text-muted);
+}
+
+.pt-opts {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pt-opt {
+  display: grid;
+  grid-template-columns: var(--cover-lg) 1fr;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-4);
+  border: var(--border) solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+}
+.pt-opt.is-winner {
+  border: var(--border-select) solid var(--color-signal);
+}
+.pt-opt-cover {
+  display: block;
+  width: var(--cover-lg);
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.pt-opt-body {
+  display: grid;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.pt-opt-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.pt-tag {
+  display: grid;
+  place-items: center;
+  flex: none;
+  min-width: var(--check-size);
+  height: var(--check-size);
+  border-radius: var(--radius-sm);
+  background: var(--color-signal);
+  color: var(--color-on-signal);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+.pt-opt-title {
+  font-size: var(--step-1);
+  font-weight: var(--weight-bold);
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+.pt-opt-artist {
+  color: var(--color-text-muted);
+}
+.pt-meter {
+  display: block;
+  height: var(--meter-h);
+  margin-top: var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-raised);
+  overflow: hidden;
+}
+.pt-meter-bar {
+  display: block;
+  height: 100%;
+  background: var(--color-signal);
+  transform-origin: left center;
+  transition: transform var(--dur-ui) var(--ease-out);
+}
+.pt-opt-votes {
+  font-size: var(--text-sm);
+  color: var(--color-signal);
+}
+
+/* ---------- QR: papel claro, margen y 280 px mínimo ---------- */
+.pt-qr {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin: auto 0 0;
+}
+.pt-qr-paper {
+  flex: none;
+  width: calc(var(--qr-size) + 2 * var(--qr-pad));
+  padding: var(--qr-pad);
+  border-radius: var(--radius-md);
+  background: var(--color-text);
+}
+.pt-qr-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.pt-qr-caption {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.pt-qr-title {
+  font-size: var(--step-2);
+  font-weight: var(--weight-bold);
+  line-height: 1.05;
+}
+.pt-qr-url {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+/* ---------- conectando / error ---------- */
+.pt-notice {
+  flex: 1;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: var(--space-4);
+  text-align: center;
+}
+.pt-notice svg {
+  color: var(--color-signal);
+}
+.pt-notice-title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: var(--weight-regular);
+  font-size: var(--step-3);
+  line-height: 1.05;
+}
+.pt-notice-text {
+  margin: 0;
+  font-size: var(--step-1);
+  color: var(--color-text-muted);
+}
+.pt-warn {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border) solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+/* pantalla angosta (no es el caso de la TV, pero no debe romperse): una sola columna */
+@media (max-width: 1100px) {
+  .pt-app {
+    padding: var(--space-4);
+  }
+  .pt-stage {
+    grid-template-columns: 1fr;
+  }
+  .pt-qr {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pt-count.is-urgent {
+    animation: none;
+  }
+  .pt-song-fill,
+  .pt-progress-bar,
+  .pt-meter-bar {
+    transition: none;
+  }
+}
+
+/* el dial de "arrancando la radio" ocupa el recuadro 16:9 donde después va el video */
+.pt-dial.pt-dial--fill {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 0;
+}
+
+/* Pantallas bajas (1366×768): todo más compacto para que quepa sin scroll. El QR sigue en 280 px. */
+@media (min-width: 1101px) and (max-height: 800px) {
+  .pt-app {
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-8);
+  }
+  .pt-brand {
+    font-size: var(--step-1);
+  }
+  .pt-stage {
+    gap: var(--space-4);
+  }
+  .pt-now,
+  .pt-side {
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+  }
+  .pt-now-title,
+  .pt-count {
+    font-size: var(--step-2);
+  }
+  .pt-heading {
+    font-size: var(--step-1);
+  }
+  .pt-opts {
+    gap: var(--space-2);
+  }
+  .pt-opt {
+    padding: var(--space-2) var(--space-3);
+  }
+  .pt-opt-cover,
+  .pt-opt {
+    --cover-lg: 3.5rem;
+  }
+  .pt-qr {
+    --qr-pad: var(--space-2);
+    gap: var(--space-4);
+  }
+  .pt-qr-title {
+    font-size: var(--step-1);
+  }
+}
+
+/* anuncio del admin: se lee en voz alta y también se muestra, sobre todo lo demás */
+.pt-announce {
+  position: fixed;
+  inset-inline: var(--space-10);
+  bottom: var(--space-10);
+  z-index: 1;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-8);
+  border: var(--border-select) solid var(--color-signal);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+.pt-announce-label {
+  font-size: var(--text-sm);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-signal);
+}
+.pt-announce-text {
+  margin: 0;
+  font-size: var(--step-2);
+  font-weight: var(--weight-bold);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+/* ---------- cinta de avisos y reloj (en la barra superior) ---------- */
+.pt-ticker {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  /* desvanecido en ambas orillas: el texto entra y sale suave junto al logo y junto al reloj (solo cuenta la opacidad) */
+  --ticker-fade: 12%;
+  mask-image: linear-gradient(to right, transparent, var(--color-bg) var(--ticker-fade), var(--color-bg) calc(100% - var(--ticker-fade)), transparent);
+}
+.pt-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: pt-ticker 50s linear infinite;
+}
+.pt-ticker-set {
+  display: flex;
+  flex: none;
+}
+.pt-ticker-item {
+  flex: none;
+  padding-inline: var(--space-6);
+  font-size: var(--step-0);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+.pt-ticker-item::before {
+  content: '';
+  display: inline-block;
+  width: var(--dot-size);
+  height: var(--dot-size);
+  margin-right: var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--color-signal);
+}
+@keyframes pt-ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+.pt-clock {
+  font-size: var(--step-1);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+}
+@media (prefers-reduced-motion: reduce) {
+  .pt-ticker-track {
+    animation: none;
+  }
+}
+
+/* aviso de conexión: sin conexión no ocupa lugar; si se cae, aparece abajo y la pantalla sigue con lo que tiene */
+.pt-banner {
+  position: fixed;
+  inset-inline: 0;
+  bottom: var(--space-4);
+  z-index: 2;
+  width: max-content;
+  max-width: calc(100% - 2 * var(--space-8));
+  margin-inline: auto;
+  margin-block: 0;
+  padding: var(--space-3) var(--space-6);
+  border: var(--border) solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--step-0);
+  text-align: center;
+}
+.pt-banner.is-error {
+  border-color: var(--color-alert);
+  background: var(--color-alert);
+  color: var(--color-on-alert);
+}
+
+/* herramienta de prueba (solo con ?debug=1) */
+.pt-debug {
+  position: fixed;
+  left: var(--space-4);
+  bottom: var(--space-4);
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-3);
+  border: var(--border) solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+.pt-debug button {
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-signal-deep);
+  color: var(--color-on-signal-deep);
+  font: inherit;
+  font-weight: var(--weight-bold);
+  cursor: pointer;
+}

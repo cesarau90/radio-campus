@@ -50,6 +50,26 @@ export async function fetchSongsByIds(ids: string[]): Promise<Song[]> {
   return unwrap(await supabase.from('songs').select('*').in('id', ids).returns<Song[]>())
 }
 
+/**
+ * Canción para arrancar la radio cuando todavía no ha sonado nada. La playlist de respaldo solo la lee el admin (RLS),
+ * así que se elige al azar entre canciones tranquilas, activas y sin tema (las restringidas ya las filtra RLS).
+ */
+export async function fetchStarterSong(): Promise<Song> {
+  const rows = unwrap(
+    await supabase
+      .from('songs')
+      .select('*')
+      .eq('active', true)
+      .eq('restricted', false)
+      .is('theme', null)
+      .lte('energy', 3)
+      .limit(60)
+      .returns<Song[]>(),
+  )
+  if (!rows || rows.length === 0) throw new Error('No hay canciones disponibles para arrancar la radio.')
+  return rows[Math.floor(Math.random() * rows.length)]
+}
+
 /** Anuncios aprobados y activos (RLS ya filtra el resto). La vigencia y el horario los decide next_announcement. */
 export async function fetchAnnouncements(): Promise<Announcement[]> {
   return unwrap(
