@@ -10,10 +10,14 @@ import type {
   AnnouncementInput,
   CampusEvent,
   CampusEventInput,
+  ContextRule,
+  ContextRuleInput,
   PlaybackPhase,
   PlaybackState,
   PlayHistoryRow,
   PlayStatus,
+  Playlist,
+  PlaylistSong,
   Round,
   RoundOption,
   Settings,
@@ -249,4 +253,85 @@ export async function fetchRecentClosedRounds(limit: number): Promise<Round[]> {
   return unwrap(
     await supabase.from('rounds').select('*').eq('status', 'closed').order('starts_at', { ascending: false }).limit(limit).returns<Round[]>(),
   )
+}
+
+// ---------- reglas contextuales (el admin escribe por RLS) ----------
+
+export async function fetchRules(): Promise<ContextRule[]> {
+  return unwrap(
+    await supabase
+      .from('context_rules')
+      .select('*')
+      .order('priority', { ascending: false })
+      .order('created_at', { ascending: true })
+      .returns<ContextRule[]>(),
+  )
+}
+
+export async function insertRule(input: ContextRuleInput): Promise<ContextRule> {
+  return unwrap(await supabase.from('context_rules').insert(input).select().single<ContextRule>())
+}
+
+export async function updateRule(id: string, patch: Partial<ContextRuleInput>): Promise<ContextRule> {
+  return unwrap(await supabase.from('context_rules').update(patch).eq('id', id).select().single<ContextRule>())
+}
+
+export async function deleteRule(id: string): Promise<void> {
+  const res = await supabase.from('context_rules').delete().eq('id', id)
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
+}
+
+// ---------- playlists ----------
+
+export async function fetchPlaylists(): Promise<Playlist[]> {
+  return unwrap(await supabase.from('playlists').select('*').order('name').returns<Playlist[]>())
+}
+
+export async function fetchPlaylistLinks(): Promise<PlaylistSong[]> {
+  return unwrap(
+    await supabase.from('playlist_songs').select('*').order('playlist_id').order('position').returns<PlaylistSong[]>(),
+  )
+}
+
+export async function addSongToPlaylist(playlistId: string, songId: string, position: number): Promise<void> {
+  const res = await supabase.from('playlist_songs').insert({ playlist_id: playlistId, song_id: songId, position })
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
+}
+
+export async function removeSongFromPlaylist(playlistId: string, songId: string): Promise<void> {
+  const res = await supabase.from('playlist_songs').delete().eq('playlist_id', playlistId).eq('song_id', songId)
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
+}
+
+/** Solo puede haber una playlist de respaldo (índice único): primero se apaga la anterior y después se enciende la nueva. */
+export async function setFallbackPlaylist(id: string): Promise<void> {
+  const off = await supabase.from('playlists').update({ is_fallback: false }).eq('is_fallback', true).neq('id', id)
+  if (off.error) throw new ApiError(off.error.message, off.error.code, off.status)
+  const on = await supabase.from('playlists').update({ is_fallback: true }).eq('id', id)
+  if (on.error) throw new ApiError(on.error.message, on.error.code, on.status)
+}
+
+// ---------- estadísticas ----------
+
+/** Todas las rondas, solo con lo necesario para las estadísticas (RLS: las rondas son públicas). */
+export async function fetchRoundStatsRows(): Promise<
+  Array<Pick<Round, 'option_a' | 'option_b' | 'votes_a' | 'votes_b' | 'status' | 'resolution'>>
+> {
+  return unwrap(
+    await supabase
+      .from('rounds')
+      .select('option_a,option_b,votes_a,votes_b,status,resolution')
+      .limit(5000)
+      .returns<Array<Pick<Round, 'option_a' | 'option_b' | 'votes_a' | 'votes_b' | 'status' | 'resolution'>>>(),
+  )
+}
+
+export async function insertPlaylist(name: string): Promise<Playlist> {
+  return unwrap(await supabase.from('playlists').insert({ name, is_fallback: false }).select().single<Playlist>())
+}
+
+/** Quita todas las canciones de una playlist (la playlist se conserva). */
+export async function clearPlaylistSongs(playlistId: string): Promise<void> {
+  const res = await supabase.from('playlist_songs').delete().eq('playlist_id', playlistId)
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
 }

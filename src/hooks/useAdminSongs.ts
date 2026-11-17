@@ -240,6 +240,7 @@ export function useAdminSongs(enabled: boolean) {
 
   return {
     songs: visible,
+    all: songs,
     total: songs.length,
     loading,
     error,

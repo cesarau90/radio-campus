@@ -1,10 +1,13 @@
 import './admin.css'
 import { ADMIN_TABS, type AdminModel } from '../hooks/useAdmin'
 import AdminLogin from './AdminLogin'
+import BackupPanel from './BackupPanel'
 import AnnouncementsPanel from './AnnouncementsPanel'
 import EventsPanel from './EventsPanel'
 import { DialMark } from './icons'
 import MonitorPanel from './MonitorPanel'
+import PlaylistsPanel from './PlaylistsPanel'
+import RulesPanel from './RulesPanel'
 import SettingsForm from './SettingsForm'
 import SimulatorPanel from './SimulatorPanel'
 import SongsPanel from './SongsPanel'
@@ -60,7 +63,16 @@ export default function AdminView(m: AdminModel) {
         {m.tab === 'monitor' && <MonitorPanel monitor={m.monitor} />}
         {m.tab === 'canciones' && <SongsPanel songs={m.songs} />}
         {m.tab === 'contexto' && <SimulatorPanel sim={m.simulator} />}
-        {m.tab === 'config' && <SettingsForm settings={m.settings} />}
+        {m.tab === 'config' && (
+          <>
+            <SettingsForm settings={m.settings} />
+            <BackupPanel backup={m.backup} />
+          </>
+        )}
+        {m.tab === 'playlists' && <PlaylistsPanel playlists={m.playlists} />}
+        {m.tab === 'reglas' && (
+          <RulesPanel rules={m.rules} genres={m.songs.suggestions.genres} moods={m.songs.suggestions.moods} themes={m.songs.suggestions.themes} />
+        )}
         {m.tab === 'eventos' && <EventsPanel events={m.events} themes={m.songs.suggestions.themes} nowMs={m.nowMs} />}
         {m.tab === 'anuncios' && <AnnouncementsPanel announcements={m.announcements} nowMs={m.nowMs} />}
       </main>
