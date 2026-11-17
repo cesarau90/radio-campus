@@ -4,7 +4,9 @@ import { useAnonymousSession } from './useAnonymousSession'
 import { useServerClock } from './useServerClock'
 import { useLiveState } from './useLiveState'
 import { useCountdown } from './useCountdown'
-import type { RoundOption, VotarView } from '../types'
+import { formatClock, spokenDuration } from '../lib/time'
+import { percentages } from '../lib/votes'
+import type { RoundOption, Song, TallyRow, VotarView } from '../types'
 
 interface Picked {
   roundId: string
@@ -111,6 +113,29 @@ export function useVotar() {
   const winnerOption: RoundOption | null =
     round && round.winner_id ? (round.winner_id === round.option_a ? 'a' : round.winner_id === round.option_b ? 'b' : null) : null
 
+  // Recuento final (solo se usa con la ronda cerrada): votos y porcentaje de A y B, con la ganadora marcada.
+  const pct = percentages(round?.votes_a ?? 0, round?.votes_b ?? 0)
+  const tally: TallyRow[] =
+    current && round
+      ? [
+          { option: 'a', title: current.songA.title, votes: round.votes_a, percent: pct.a, isWinner: winnerOption === 'a' },
+          { option: 'b', title: current.songB.title, votes: round.votes_b, percent: pct.b, isWinner: winnerOption === 'b' },
+        ]
+      : []
+
+  // Contador en mm:ss. Solo hay cuenta mientras la ronda está abierta y el reloj del servidor está listo.
+  const secondsLeft = countdown.remainingSec
+  const timeLabel = secondsLeft === null ? null : formatClock(secondsLeft)
+  const timeSpoken = secondsLeft === null ? null : spokenDuration(secondsLeft)
+  const urgent = secondsLeft !== null && secondsLeft > 0 && secondsLeft <= 10
+
+  // "Sonando ahora": playback_state.current_song_id lo escribe /pantalla (Fase 6). Mientras no haya dato, es null
+  // y las vistas simplemente no pintan la sección.
+  const phase = live.playback?.phase ?? 'idle'
+  const nowPlayingId = live.playback?.current_song_id ?? null
+  const nowPlaying: Song | null =
+    nowPlayingId && phase !== 'idle' && phase !== 'error' ? (live.songs[nowPlayingId] ?? null) : null
+
   const retry = useCallback(() => {
     session.retry()
     void live.refresh()
@@ -127,11 +152,14 @@ export function useVotar() {
     justVoted: roundId !== null && stampedRound === roundId,
     submitting,
     voteError,
-    secondsLeft: countdown.remainingSec,
+    timeLabel,
+    timeSpoken,
+    urgent,
     progress,
+    nowPlaying,
     connection: live.connection,
     result: round
-      ? { votesA: round.votes_a, votesB: round.votes_b, resolution: round.resolution, winner, winnerOption }
+      ? { votesA: round.votes_a, votesB: round.votes_b, resolution: round.resolution, winner, winnerOption, tally }
       : null,
     select,
     vote,

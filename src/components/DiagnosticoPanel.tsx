@@ -18,7 +18,7 @@ interface Props {
   }
 }
 
-const row = { display: 'grid', gridTemplateColumns: '14rem 1fr', gap: '1rem', padding: '0.5rem 0', borderBottom: '1px solid var(--paper-2)' } as const
+const row = { display: 'grid', gridTemplateColumns: '14rem 1fr', gap: '1rem', padding: '0.5rem 0', borderBottom: '1px solid var(--color-line)' } as const
 
 /** Panel de diagnóstico (solo desarrollo). Presentacional: todo llega por props. */
 export default function DiagnosticoPanel({ session, clock, countdown, live }: Props) {
@@ -36,14 +36,14 @@ export default function DiagnosticoPanel({ session, clock, countdown, live }: Pr
   ]
   return (
     <main style={{ padding: '2rem', maxWidth: '56rem' }}>
-      <p className="mono" style={{ margin: 0, color: 'var(--muted-on-paper)' }}>
+      <p className="mono" style={{ margin: 0, color: 'var(--color-text-muted)' }}>
         solo desarrollo
       </p>
       <h1 style={{ fontSize: 'var(--step-3)', margin: '0.25rem 0 1.5rem' }}>Diagnóstico</h1>
       <dl style={{ margin: 0 }} data-testid="diagnostico">
         {items.map(([k, v]) => (
           <div key={k} style={row}>
-            <dt className="mono" style={{ color: 'var(--muted-on-paper)' }}>{k}</dt>
+            <dt className="mono" style={{ color: 'var(--color-text-muted)' }}>{k}</dt>
             <dd className="mono" style={{ margin: 0 }} data-key={k}>{v}</dd>
           </div>
         ))}

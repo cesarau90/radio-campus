@@ -1,4 +1,5 @@
 import type { RoundOption, Song } from '../types'
+import Cover from './Cover'
 import { CheckMark } from './icons'
 
 export type PanelState = 'idle' | 'selected' | 'dimmed' | 'chosen'
@@ -7,43 +8,46 @@ interface Props {
   option: RoundOption
   song: Song
   state: PanelState
-  /** Solo en la ronda abierta sin voto: el panel es una opción de radio (teclado y lector de pantalla incluidos). */
+  /** Solo en la ronda abierta sin voto: la tarjeta es una opción de radio (teclado y lector de pantalla incluidos). */
   interactive: boolean
   /** true solo cuando el voto acaba de enviarse: el sello se anima. Al recargar aparece ya puesto. */
   stampAnimated: boolean
   onSelect: (option: RoundOption) => void
 }
 
-/** Una de las dos estaciones del dial: bloque de tinta (A) o naranja señal (B). */
+/**
+ * Una de las dos canciones en juego. Pantallas normales: tarjeta con portada protagonista y etiqueta A/B chica.
+ * Pantallas bajas o muy angostas: fila compacta (miniatura, título y artista, círculo de selección a la derecha).
+ * Es el mismo marcado; el CSS decide la forma.
+ */
 export default function OptionPanel({ option, song, state, interactive, stampAnimated, onSelect }: Props) {
   const letter = option.toUpperCase()
-  const tone = option === 'a' ? 'ink' : 'signal'
-  const className = `vt-panel vt-panel--${tone} is-${state}`
+  const className = `vt-card is-${state}`
+  const checked = state === 'selected' || state === 'chosen'
 
   const body = (
     <>
-      <span className="vt-letter" aria-hidden="true">
-        {letter}
+      <span className="vt-card-cover">
+        <Cover song={song} />
+        <span className="vt-tag mono" aria-hidden="true">
+          {letter}
+        </span>
+        {state === 'chosen' && (
+          <span className={`vt-stamp${stampAnimated ? ' is-new' : ''}`}>
+            <CheckMark size={16} />
+            Voto registrado
+          </span>
+        )}
       </span>
-      <span className="vt-panel-body">
+      <span className="vt-card-body">
         <span className="sr-only">Opción {letter}: </span>
         <span className="vt-title">{song.title}</span>
         <span className="vt-artist">{song.artist}</span>
-        <span className="vt-genre">{song.genre}</span>
+        <span className="vt-genre mono">{song.genre}</span>
       </span>
-
-      {state === 'selected' && (
-        <span className="vt-picked">
-          <CheckMark size={16} />
-          Tu elección
-        </span>
-      )}
-      {state === 'chosen' && (
-        <span className={`vt-stamp${stampAnimated ? ' is-new' : ''}`}>
-          <CheckMark size={16} />
-          Voto registrado
-        </span>
-      )}
+      <span className="vt-check" aria-hidden="true">
+        {checked && <CheckMark size={16} />}
+      </span>
     </>
   )
 

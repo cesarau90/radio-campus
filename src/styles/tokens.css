@@ -1,0 +1,106 @@
+/*
+  TOKENS — única fuente de colores, fuentes, tamaños, espacios, radios y movimiento.
+  Ningún componente ni hoja de estilos escribe un hex, un rem de espaciado o un radio suelto: usa estas variables.
+  Dirección: cartel + app de música. Fondo de tinta, naranja señal como ÚNICO acento fijo.
+
+  Contrastes medidos (WCAG, texto normal ≥ 4,5:1):
+    --color-text         sobre --color-bg        ≈ 16:1
+    --color-text-muted   sobre --color-surface   ≈ 6,6:1
+    --color-signal       sobre --color-surface   ≈ 5,1:1   (como texto)
+    --color-on-signal    sobre --color-signal    ≈ 5,8:1   (el blanco sobre naranja da 3,4:1 y NO pasa)
+    --color-on-alert     sobre --color-alert     ≈ 5,0:1
+*/
+:root {
+  /* ---------- color ---------- */
+  --color-bg: #160f0c; /* respaldo del fondo */
+  --color-surface: #241a16; /* tarjetas */
+  --color-surface-raised: #33261f;
+  --color-line: #55443c; /* borde normal */
+
+  --color-text: #f7eadb;
+  --color-text-muted: #bda99b;
+
+  --color-signal: #ff6b00; /* naranja principal: el acento, nunca cambia con la portada */
+  --color-signal-hover: #ff8a24; /* naranja de interacción */
+  --color-on-signal: #1a0600;
+  /* Botón de confirmar: texto blanco sobre naranja profundo = 4,62:1.
+     Blanco sobre --color-signal (#ff6b00) daría 2,86:1 y no pasa. */
+  --color-signal-deep: #cc4a00;
+  --color-on-signal-deep: #ffffff;
+
+  --color-alert: #d7263d;
+  --color-on-alert: #ffffff;
+
+  /* ---------- tipografía ---------- */
+  --font-display: 'Bricolage Grotesque', 'Arial Narrow', sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
+  --font-serif: 'DM Serif Display', Georgia, 'Times New Roman', serif; /* solo para el título principal */
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --step-0: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.1rem + 0.7vw, 1.6rem);
+  --step-2: clamp(1.75rem, 1.4rem + 1.6vw, 2.6rem);
+  --step-3: clamp(2.25rem, 1.8rem + 3.2vw, 4rem);
+  --step-4: clamp(3.5rem, 2rem + 7vw, 8rem);
+  --text-count: 1.75rem; /* contador mm:ss */
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 800;
+
+  /* ---------- espacios ---------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+
+  /* ---------- forma ---------- */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+  --border: 1px;
+  --border-strong: 2px;
+  --border-select: 3px; /* borde naranja de la canción elegida */
+
+  /* ---------- medidas ---------- */
+  --content-max: 36rem;
+  --content-wide: 56rem; /* contenedor de escritorio (≥ 900 px) */
+  --button-max: 36rem; /* botón de confirmar en escritorio: ancho, no de orilla a orilla */
+  --ratio-cover-wide: 16 / 7; /* portada de tarjeta en escritorio: más baja para que todo quepa sin scroll */
+  --ratio-winner: 16 / 9; /* portada de la ganadora */
+  --meter-h: 0.625rem; /* barras del recuento */
+  --dial-size: 7rem; /* dial de la pantalla de espera */
+  --cover-sm: 3rem;
+  --cover-zoom-square: 1.34; /* miniatura cuadrada: las barras negras de hqdefault son el 25 % del alto */
+  --cover-min: 8.5rem; /* alto mínimo de la portada de tarjeta en celular */
+  --card-max: 21rem; /* alto máximo de cada tarjeta en celular, para que no se estiren de más */
+  --check-size: 1.75rem; /* círculo de selección */
+  --cover-lg: 5.5rem;
+  --tap-min: 3.5rem;
+  --progress-h: 4px;
+  --dot-size: 0.5rem;
+  /* Fondo: estudio de radio generado con IA, sin texto ni interfaz (ver créditos en docs/ESTADO.md).
+     Dos variantes en public/: completa (1672×941, ~80 KB) y recorte vertical para celular (772×941, ~42 KB). */
+  --backdrop-image: url('/fondo-estudio.webp');
+  --backdrop-image-mobile: url('/fondo-estudio-movil.webp');
+  --panel-shade: 78%; /* panel oscuro translúcido detrás de texto sobre la foto (pantalla de espera) */
+  --backdrop-shade: 40%; /* capa oscura sobre la foto para que el contenido se lea */
+  --backdrop-focus: 55% 50%; /* en celular, qué parte del recorte vertical se ve (lámpara a la derecha) */
+  --opacity-dim: 0.85; /* solo la portada de la opción no elegida, apenas atenuada; el texto no cambia */
+
+  /* ---------- movimiento ---------- */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-fast: 140ms;
+  --dur-ui: 220ms;
+  --dur-pulse: 1.4s;
+  --dur-ring: 2.6s;
+
+  color-scheme: dark;
+}

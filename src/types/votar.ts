@@ -9,3 +9,13 @@
  * - closed: ronda cerrada, se muestra la ganadora
  */
 export type VotarView = 'connecting' | 'error' | 'no-round' | 'voting' | 'voted' | 'counting' | 'closed'
+
+/** Una fila del recuento final de una ronda cerrada (opción, canción, votos y porcentaje). */
+export interface TallyRow {
+  option: 'a' | 'b'
+  title: string
+  votes: number
+  /** 0–100; las dos filas suman 100 (o 0 si nadie votó). */
+  percent: number
+  isWinner: boolean
+}

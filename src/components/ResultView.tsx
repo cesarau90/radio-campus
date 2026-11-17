@@ -1,13 +1,17 @@
-import type { RoundOption, RoundResolution, Song } from '../types'
+import type { RoundOption, RoundResolution, Song, TallyRow } from '../types'
+import Cover from './Cover'
+import { CheckMark } from './icons'
+import NowPlaying from './NowPlaying'
 
 interface Props {
   winner: Song | null
   winnerOption: RoundOption | null
-  votesA: number
-  votesB: number
+  tally: TallyRow[]
   resolution: RoundResolution | null
   /** La opción por la que votó esta persona en la ronda, si votó. */
   myOption: RoundOption | null
+  /** Lo que suena ahora, si hay dato. */
+  nowPlaying: Song | null
 }
 
 const RESOLUTION_TEXT: Record<RoundResolution, string> = {
@@ -22,43 +26,72 @@ function myVoteLine(myOption: RoundOption | null, winnerOption: RoundOption | nu
   return myOption === winnerOption ? 'Tu voto ayudó a ganar.' : 'Esta vez ganó la otra opción.'
 }
 
-/** Resultado de la ronda cerrada: la ganadora, los conteos finales y qué pasó con el voto de esta persona. */
-export default function ResultView({ winner, winnerOption, votesA, votesB, resolution, myOption }: Props) {
-  const tone = winnerOption === 'b' ? 'signal' : 'ink'
+/** Ronda cerrada: la ganadora con su portada, el recuento A contra B, qué pasó con tu voto y qué sigue. */
+export default function ResultView({ winner, winnerOption, tally, resolution, myOption, nowPlaying }: Props) {
   const resolutionText = resolution ? RESOLUTION_TEXT[resolution] : ''
   return (
     <main className="vt-result">
       <h1 className="vt-heading">Ronda cerrada</h1>
 
-      {winner && (
-        <section className={`vt-panel vt-panel--${tone} vt-winner`} aria-label="Canción ganadora">
-          <span className="vt-letter" aria-hidden="true">
-            {winnerOption ? winnerOption.toUpperCase() : ''}
-          </span>
-          <span className="vt-panel-body">
-            <span className="vt-title">{winner.title}</span>
-            <span className="vt-artist">{winner.artist}</span>
-          </span>
-          <span className="vt-stamp is-new">Ganó</span>
-        </section>
+      {nowPlaying && (
+        <div className="vt-now vt-result-now">
+          <NowPlaying song={nowPlaying} />
+        </div>
       )}
 
-      <dl className="vt-tally">
-        <div>
-          <dt>Opción A</dt>
-          <dd className="mono">{votesA}</dd>
-        </div>
-        <div>
-          <dt>Opción B</dt>
-          <dd className="mono">{votesB}</dd>
-        </div>
-      </dl>
+      <div className="vt-result-grid">
+        {winner && (
+          <section className="vt-card is-chosen vt-winner" aria-label="Canción ganadora">
+            <span className="vt-card-cover vt-winner-cover">
+              <Cover song={winner} />
+              {winnerOption && (
+                <span className="vt-tag mono" aria-hidden="true">
+                  {winnerOption.toUpperCase()}
+                </span>
+              )}
+              <span className="vt-stamp is-new">
+                <CheckMark size={16} />
+                Ganadora
+              </span>
+            </span>
+            <span className="vt-card-body">
+              <span className="vt-title">{winner.title}</span>
+              <span className="vt-artist">{winner.artist}</span>
+              <span className="vt-genre mono">{winner.genre}</span>
+            </span>
+          </section>
+        )}
 
-      <p className="vt-result-line">{myVoteLine(myOption, winnerOption)}</p>
-      {resolutionText && <p className="vt-result-note">{resolutionText}</p>}
-      <p className="vt-result-note" aria-live="polite">
-        La siguiente votación empieza en unos momentos; esta pantalla se actualiza sola.
-      </p>
+        <div className="vt-result-side">
+          <ul className="vt-tally" aria-label="Votos de la ronda">
+            {tally.map((row) => (
+              <li key={row.option} className={`vt-tally-row${row.isWinner ? ' is-winner' : ''}`}>
+                <span className="vt-tally-head">
+                  <span className="vt-tally-tag mono" aria-hidden="true">
+                    {row.option.toUpperCase()}
+                  </span>
+                  <span className="vt-tally-title">
+                    <span className="sr-only">Opción {row.option.toUpperCase()}: </span>
+                    {row.title}
+                  </span>
+                  <span className="vt-tally-num mono">
+                    {row.votes} {row.votes === 1 ? 'voto' : 'votos'} · {row.percent} %
+                  </span>
+                </span>
+                <span className="vt-meter" aria-hidden="true">
+                  <span className="vt-meter-fill" style={{ width: `${row.percent}%` }} />
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="vt-result-msg" aria-live="polite">
+            <p className="vt-result-line">{myVoteLine(myOption, winnerOption)}</p>
+            {resolutionText && <p className="vt-result-note">{resolutionText}</p>}
+            <p className="vt-result-next">La siguiente ronda empieza pronto.</p>
+          </div>
+        </div>
+      </div>
     </main>
   )
 }

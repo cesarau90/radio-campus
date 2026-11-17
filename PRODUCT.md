@@ -33,13 +33,15 @@ La radio responde a **dónde y cuándo está el campus** (exámenes → instrume
 
 - Stack obligatorio: React + Vite + TypeScript + React Router, Supabase (Postgres, Auth, Realtime, RPC), Vercel, YouTube IFrame API, Open-Meteo, Web Speech API, qrcode.react.
 - Toda la lógica en hooks (`src/hooks`); los componentes solo reciben props; tipos en `src/types` con barrel.
-- Estados de `/votar` que deben existir: ronda abierta con dos opciones, voto confirmado, "ya votaste" (también tras recargar), ronda cerrada, sin ronda activa, sin conexión.
-- Terminología: "ronda", "votar", "ganadora", "pantalla", "siguiente canción". Idioma: español de México.
-- *Sin decidir:* qué mostrar a quien llega con la ronda cerrada (resultado de la última ronda vs. solo "espera la siguiente").
+- Estados de `/votar` que deben existir: ronda abierta con dos opciones, voto confirmado, "ya votaste" (también tras recargar), contando votos, ronda cerrada, sin ronda activa ("Aún no hay votación"), sin conexión, conectando y error.
+- Terminología: "ronda", "votar", "ganadora", "pantalla", "siguiente canción", "Sonando ahora". Idioma: español de México.
+- **Decidido (2026-11-14):** a quien llega con la ronda cerrada se le muestra el resultado de la última ronda: la ganadora con su portada y la marca "Ganadora", el recuento A contra B con porcentajes, qué pasó con su voto, "La siguiente ronda empieza pronto." y, si hay dato, "Sonando ahora". Los conteos solo se ven con la ronda cerrada (mientras está abierta no se muestran, para no sesgar el voto).
+- "Sonando ahora" sale de `playback_state.current_song_id` (lo escribe `/pantalla`); si no hay dato no se muestra ni se inventa.
+- Las portadas se derivan de `youtube_id` (`img.youtube.com/vi/<id>/hqdefault.jpg`); `songs` no tiene columna de imagen. Si una portada no carga, se muestra un bloque con el título.
 
 ## Brand Commitments
 
-Nombre de trabajo: **Radio Campus**. Dirección visual aprobada por el usuario en la Fase 0: *cartel de radio universitaria* (ver `src/index.css`). No hay logotipo ni nombre institucional definido.
+Nombre de trabajo: **Radio Campus**. Dirección visual **vigente** (rediseño del 2026-11-14, aprobada por el usuario): *cartel + app de música*. Fondo oscuro con tonos café, crema y un único acento naranja `#FF6B00`; portadas de las canciones como protagonistas; título principal en serif (DM Serif Display), interfaz en Bricolage Grotesque y datos/contador en DM Mono; fondo con la foto de un estudio de radio (generada con IA, sin texto) bajo una capa oscura. Todos los valores viven en `src/styles/tokens.css`. Reemplaza a la dirección "cartel de radio universitaria" en papel crema de la Fase 0. El símbolo (la aguja del dial) se conserva. No hay logotipo ni nombre institucional definido.
 
 ## Evidence on Hand
 
@@ -55,4 +57,10 @@ Nombre de trabajo: **Radio Campus**. Dirección visual aprobada por el usuario e
 
 ## Accessibility & Inclusion
 
-Legible a la luz del sol (alto contraste), objetivos táctiles amplios, respeta `prefers-reduced-motion`, estado del voto comunicado con texto y no solo con color. Español de México.
+Contraste de texto ≥ 4,5:1 **medido** sobre la foto de fondo y sobre cada superficie (el texto que pueda caer sobre zonas claras de la foto va sobre un panel translúcido o sólido); el botón de confirmar usa texto blanco sobre `#CC4A00` (4,62:1) porque el blanco sobre `#FF6B00` no pasa. Objetivos táctiles amplios, respeta `prefers-reduced-motion` (el punto de EN VIVO y los anillos del dial se detienen), estado del voto comunicado con texto y no solo con color. Español de México.
+
+## Credits
+
+- Imagen de fondo del estudio de radio: **generada con IA** (aportada por el usuario). Archivos `public/fondo-estudio.webp` y `public/fondo-estudio-movil.webp`.
+- Portadas: miniaturas públicas de YouTube; derechos de sus titulares.
+- Fuentes: Bricolage Grotesque, DM Mono y DM Serif Display (Google Fonts, licencia OFL).

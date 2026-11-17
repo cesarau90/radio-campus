@@ -3,10 +3,12 @@ import { useEffect, useRef } from 'react'
 import type { RoundOption } from '../types'
 import type { VotarModel } from '../hooks/useVotar'
 import ConnectionBanner from './ConnectionBanner'
+import NowPlaying from './NowPlaying'
 import OptionPanel, { type PanelState } from './OptionPanel'
 import ResultView from './ResultView'
 import StatusNotice from './StatusNotice'
 import VotarHeader from './VotarHeader'
+import WaitingView from './WaitingView'
 
 /** Pantalla completa de /votar. Solo pinta el modelo que arma useVotar; no tiene lógica propia. */
 export default function VotarView(m: VotarModel) {
@@ -48,10 +50,8 @@ export default function VotarView(m: VotarModel) {
     return (
       <div className="vt-app">
         <ConnectionBanner status={m.connection} />
-        <StatusNotice
-          title="Aún no hay votación"
-          text="La siguiente ronda abre en cuanto empiece la próxima canción. Esta pantalla se actualiza sola."
-        />
+        <VotarHeader timeLabel={null} timeSpoken={null} urgent={false} progress={0} />
+        <WaitingView nowPlaying={m.nowPlaying} />
       </div>
     )
   }
@@ -60,14 +60,14 @@ export default function VotarView(m: VotarModel) {
     return (
       <div className="vt-app">
         <ConnectionBanner status={m.connection} />
-        <VotarHeader secondsLeft={null} progress={0} />
+        <VotarHeader timeLabel={null} timeSpoken={null} urgent={false} progress={0} />
         <ResultView
           winner={m.result?.winner ?? null}
           winnerOption={m.result?.winnerOption ?? null}
-          votesA={m.result?.votesA ?? 0}
-          votesB={m.result?.votesB ?? 0}
+          tally={m.result?.tally ?? []}
           resolution={m.result?.resolution ?? null}
           myOption={m.myOption}
+          nowPlaying={m.nowPlaying}
         />
       </div>
     )
@@ -107,15 +107,21 @@ export default function VotarView(m: VotarModel) {
   return (
     <div className="vt-app">
       <ConnectionBanner status={m.connection} />
-      <VotarHeader secondsLeft={m.secondsLeft} progress={m.progress} />
+      <VotarHeader timeLabel={m.timeLabel} timeSpoken={m.timeSpoken} urgent={m.urgent} progress={m.progress} />
       <p className="sr-only" role="status" aria-live="polite">
         {announcement}
       </p>
 
       <main className="vt-ballot">
+        {m.nowPlaying && (
+          <div className="vt-now">
+            <NowPlaying song={m.nowPlaying} />
+          </div>
+        )}
         <h1 className="vt-heading" ref={headingRef} tabIndex={-1}>
           {heading}
         </h1>
+        {voting && <p className="vt-subtitle">Elige la canción que quieres escuchar</p>}
 
         <div
           className={`vt-panels${hasSelection ? ' has-selection' : ''}`}
