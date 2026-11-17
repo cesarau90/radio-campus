@@ -20,6 +20,22 @@
 | 12 | Funciona en **producción** (Vercel) | Cumplido | `/votar`, `/pantalla` y `/admin` responden en https://radio-campus-five.vercel.app; [`fase5/rediseno/produccion-390x844-espera.png`](evidencias/fase5/rediseno/produccion-390x844-espera.png) |
 | 13 | **Ronda real con 2–3 celulares** en producción | **Pendiente** | Se hace antes de la demo (ver ESTADO.md → Antes de la demo) |
 
+## Sesión anónima en Safari/WebKit (2026-11-17)
+
+Bug reportado desde un iPhone con Safari en producción: `cast_vote` → 401 / 42501 justo después de crear la sesión anónima (el cliente llamó sin JWT, como rol `anon`). Reproducido y arreglado; el detalle de la causa y del arreglo está en [ESTADO.md](ESTADO.md#bug-del-iphone-con-safari-permission-denied-for-function-cast_vote-2026-11-17).
+
+Prueba en **WebKit (iPhone 13 emulado, Playwright)** llamando a `castVote` con una ronda inexistente (no escribe nada): autenticado responde `not_found`; como `anon` daría 401 / 42501.
+
+| Escenario | Antes | Después |
+|---|---|---|
+| Normal | OK | OK |
+| La clave de la sesión desaparece de `localStorage` | **401 · 42501** | OK (copia en memoria) |
+| `localStorage` lanza `SecurityError` | error sin petición | OK |
+| La sesión se pierde por completo | — | OK (`ensureSession` crea otra) |
+| El servidor responde 401/42501 a la primera llamada | — | OK (reintento con sesión nueva) |
+
+Pendiente: repetir la prueba con un iPhone real antes de la demo.
+
 ## Pruebas de base de datos
 
 ### Seguridad RLS: ningún anónimo puede escribir (Fase 1)

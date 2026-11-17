@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { castVote, fetchMyVote } from '../lib/api'
+import { voteErrorMessage } from '../lib/errors'
 import { useAnonymousSession } from './useAnonymousSession'
 import { useServerClock } from './useServerClock'
 import { useLiveState } from './useLiveState'
@@ -93,8 +94,10 @@ export function useVotar() {
         setVoteError('Esa ronda ya no existe. Espera la siguiente.')
         void live.refresh()
       }
-    } catch {
-      setVoteError('No se pudo enviar tu voto. Revisa tu conexión e inténtalo otra vez.')
+    } catch (e) {
+      // 401 / 42501 no es "sin conexión": cada causa muestra su propio mensaje.
+      console.error('[voto] cast_vote falló', e)
+      setVoteError(voteErrorMessage(e))
     } finally {
       setSubmitting(false)
     }

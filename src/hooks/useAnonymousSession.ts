@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { createAnonymousSession } from '../lib/session'
 
 interface SessionState {
   userId: string | null
@@ -9,6 +10,9 @@ interface SessionState {
 
 function friendlyError(e: unknown): string {
   const msg = e instanceof Error ? e.message : String(e)
+  if (/no la pudo conservar/i.test(msg)) {
+    return 'Este navegador no deja guardar tu sesión (¿modo privado o almacenamiento bloqueado?). Desactívalo para esta página e inténtalo otra vez.'
+  }
   if (/anonymous sign-ins are disabled/i.test(msg)) {
     return 'Los inicios de sesión anónimos están desactivados en Supabase (Authentication > Sign In / Providers).'
   }
@@ -45,9 +49,10 @@ export function useAnonymousSession() {
           if (!cancelled) setState({ userId: data.session.user.id, ready: true, error: null })
           return
         }
-        const { data: res, error } = await supabase.auth.signInAnonymously()
-        if (error) throw error
-        if (!cancelled) setState({ userId: res.user?.id ?? null, ready: true, error: null })
+        // Crea la sesión y confirma con getSession() que quedó guardada: hasta entonces la pantalla no deja votar.
+        await createAnonymousSession()
+        const { data: confirmed } = await supabase.auth.getSession()
+        if (!cancelled) setState({ userId: confirmed.session?.user.id ?? null, ready: true, error: null })
       } catch (e) {
         if (!cancelled) setState({ userId: null, ready: false, error: friendlyError(e) })
       }

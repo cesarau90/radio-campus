@@ -3,6 +3,8 @@
  * Toda la lógica vive en src/hooks; aquí solo se traduce `{ data, error }` a valores o errores.
  */
 import { supabase } from './supabase'
+import { ApiError, isAuthError } from './errors'
+import { createAnonymousSession, ensureSession } from './session'
 import type {
   Announcement,
   AnnouncementInput,
@@ -21,8 +23,8 @@ import type {
   VoteResult,
 } from '../types'
 
-function unwrap<T>(res: { data: T | null; error: { message: string } | null }): T {
-  if (res.error) throw new Error(res.error.message)
+function unwrap<T>(res: { data: T | null; error: { message: string; code?: string } | null; status?: number }): T {
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
   return res.data as T
 }
 
@@ -39,7 +41,7 @@ export async function fetchPlaybackState(): Promise<PlaybackState> {
 /** La ronda abierta; si no hay, la más reciente (para mostrar el resultado). */
 export async function fetchCurrentRound(): Promise<Round | null> {
   const open = await supabase.from('rounds').select('*').eq('status', 'open').maybeSingle<Round>()
-  if (open.error) throw new Error(open.error.message)
+  if (open.error) throw new ApiError(open.error.message, open.error.code, open.status)
   if (open.data) return open.data
   const last = await supabase
     .from('rounds')
@@ -47,7 +49,7 @@ export async function fetchCurrentRound(): Promise<Round | null> {
     .order('created_at', { ascending: false })
     .limit(1)
     .maybeSingle<Round>()
-  if (last.error) throw new Error(last.error.message)
+  if (last.error) throw new ApiError(last.error.message, last.error.code, last.status)
   return last.data
 }
 
@@ -85,8 +87,10 @@ export async function fetchAnnouncements(): Promise<Announcement[]> {
 
 /** El voto del usuario actual en una ronda (RLS solo deja ver el propio). */
 export async function fetchMyVote(roundId: string): Promise<RoundOption | null> {
+  // Sin sesión, RLS devolvería "no hay voto" sin error: se confirma la sesión antes para no engañar a la pantalla.
+  await ensureSession()
   const res = await supabase.from('votes').select('option').eq('round_id', roundId).maybeSingle<{ option: RoundOption }>()
-  if (res.error) throw new Error(res.error.message)
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
   return res.data?.option ?? null
 }
 
@@ -100,8 +104,23 @@ export async function fetchIsAdmin(): Promise<boolean> {
   return unwrap(await supabase.rpc('is_admin')) === true
 }
 
+/**
+ * Emite el voto. Antes se confirma que haya sesión (si no, se crea una anónima). Si aun así el servidor responde
+ * 401 / 42501 (la llamada salió sin JWT), se rehace la sesión anónima y se reintenta UNA vez. Nunca se le da permiso
+ * a `anon` sobre cast_vote: el voto exige una sesión real.
+ */
 export async function castVote(roundId: string, option: RoundOption): Promise<VoteResult> {
-  return unwrap(await supabase.rpc('cast_vote', { p_round_id: roundId, p_option: option })) as VoteResult
+  const call = async () =>
+    unwrap(await supabase.rpc('cast_vote', { p_round_id: roundId, p_option: option })) as VoteResult
+  await ensureSession()
+  try {
+    return await call()
+  } catch (e) {
+    if (!isAuthError(e)) throw e
+    console.warn('[sesión] cast_vote respondió sin permiso; se rehace la sesión anónima y se reintenta una vez', e)
+    await createAnonymousSession()
+    return await call()
+  }
 }
 
 export async function startRound(temp: number | null): Promise<Round> {
@@ -128,12 +147,12 @@ export async function recordPlay(input: {
     p_status: input.status ?? 'ok',
     p_note: input.note ?? null,
   })
-  if (res.error) throw new Error(res.error.message)
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
 }
 
 export async function setPhase(phase: PlaybackPhase): Promise<void> {
   const res = await supabase.rpc('set_phase', { p_phase: phase })
-  if (res.error) throw new Error(res.error.message)
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
 }
 
 /** El anuncio que toca ahora (el servidor decide vigencia, horario y frecuencia). */
@@ -144,7 +163,7 @@ export async function fetchNextAnnouncement(): Promise<Announcement | null> {
 
 export async function markAnnouncementPlayed(id: string): Promise<void> {
   const res = await supabase.rpc('mark_announcement_played', { p_id: id })
-  if (res.error) throw new Error(res.error.message)
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
 }
 
 // ---------- admin: escrituras (la base solo las deja si is_admin(); RLS) ----------
@@ -164,7 +183,7 @@ export async function updateSong(id: string, patch: Partial<SongInput>): Promise
 
 export async function deleteSong(id: string): Promise<void> {
   const res = await supabase.from('songs').delete().eq('id', id)
-  if (res.error) throw new Error(res.error.message)
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
 }
 
 export async function fetchEvents(): Promise<CampusEvent[]> {
@@ -181,7 +200,7 @@ export async function updateEvent(id: string, patch: Partial<CampusEventInput>):
 
 export async function deleteEvent(id: string): Promise<void> {
   const res = await supabase.from('events').delete().eq('id', id)
-  if (res.error) throw new Error(res.error.message)
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
 }
 
 export async function insertAnnouncement(input: AnnouncementInput): Promise<Announcement> {
@@ -194,7 +213,7 @@ export async function updateAnnouncement(id: string, patch: Partial<Announcement
 
 export async function deleteAnnouncement(id: string): Promise<void> {
   const res = await supabase.from('announcements').delete().eq('id', id)
-  if (res.error) throw new Error(res.error.message)
+  if (res.error) throw new ApiError(res.error.message, res.error.code, res.status)
 }
 
 export async function updateSettings(patch: Partial<Omit<Settings, 'id'>>): Promise<Settings> {
