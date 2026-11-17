@@ -258,7 +258,9 @@ export function usePantalla() {
     songLeftLabel: songCountdown.remainingSec === null ? null : formatClock(songCountdown.remainingSec),
     paused: settings?.paused ?? false,
     attachPlayer: player.wrapRef,
-    playerPlaying: player.status === 'playing',
+    // El video solo se ve mientras suena la canción: durante un anuncio y cuando el tiempo de la canción ya terminó
+    // se muestra la portada (si no, se vería el último cuadro congelado del video).
+    playerPlaying: player.status === 'playing' && playback?.phase !== 'announcement' && !songCountdown.expired,
     soundBlocked: player.status === 'blocked' || speech.blocked,
     unlockSound: () => {
       player.unlock()

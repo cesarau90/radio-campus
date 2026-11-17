@@ -6,7 +6,7 @@
 
 **Fases 0 a 8 hechas, desplegadas y verificadas; la Fase 9 (pulido y documentación) está en curso.** Producción: **https://radio-campus-five.vercel.app** (repo público: https://github.com/cesarau90/radio-campus). Cada push a `main` se publica solo en Vercel (cada fase se comprobó con el estado "success" y los mismos archivos `index-*.js/css` que el build local).
 
-**Lo que falta para cerrar:** commit de la Fase 9 (con el OK del usuario), la **ronda real con 2–3 celulares** y la limpieza de datos de prueba (ver "Antes de la demo").
+**Lo que falta para cerrar:** la limpieza de los datos de prueba (ver "Antes de la demo"). La ronda real en producción con PC e iPhone ya se hizo (2026-11-17; evidencias en `docs/evidencias/demo/`).
 
 | Fase | Estado | Commit |
 |---|---|---|
@@ -34,7 +34,7 @@
   - `useAnonymousSession`: la pantalla no queda lista para votar hasta que la sesión está confirmada; si el navegador no puede conservarla, muestra "Este navegador no deja guardar tu sesión (¿modo privado o almacenamiento bloqueado?)…".
   - `src/lib/errors.ts`: `ApiError` (con código y estado HTTP), `SessionError` y mensajes por causa: **401/42501 ya no se muestra como "sin conexión"** ("No pudimos verificar tu sesión en este navegador… Recarga la página…"); sin red → "Revisa tu conexión"; otro error → "No se pudo registrar tu voto. Inténtalo otra vez".
 - **Prueba (WebKit/iPhone 13, `castVote` real, sin escribir datos: ronda inexistente → `not_found` si va autenticado):** normal OK; clave de sesión borrada de `localStorage` OK; `localStorage` lanzando `SecurityError` OK; sesión perdida por completo (nueva sesión anónima) OK; servidor responde 401/42501 a la primera llamada → reintento con sesión nueva OK. **Antes del arreglo**, el segundo caso daba 401/42501.
-- **Límites:** (1) rehacer la sesión anónima crea otra identidad: si alguien ya había votado con la anterior y la perdió, podría votar otra vez (límite conocido del voto anónimo). (2) No se probó en un iPhone real; **antes de la demo, votar desde un iPhone con Safari** (y, si falla, abrir la consola/`Develop` o mirar de nuevo los logs de la API). (3) En desarrollo React crea la sesión dos veces (StrictMode); en producción es una.
+- **Límites:** (1) rehacer la sesión anónima crea otra identidad: si alguien ya había votado con la anterior y la perdió, podría votar otra vez (límite conocido del voto anónimo). (2) No se probó en un iPhone real; **antes de la demo, votar desde un iPhone con Safari** (y, si falla, abrir la consola/`Develop` o mirar de nuevo los logs de la API). (3) En desarrollo React crea la sesión dos veces (StrictMode); en producción es una. **Verificado en un iPhone real el 2026-11-17** (Safari abierto desde la cámara): voto registrado; evidencia en `docs/evidencias/demo/`.
 
 ## Fase 9 (pulido y documentación): en curso (2026-11-17)
 
@@ -42,7 +42,9 @@
 - **Bloque 2, documentación (escrita):** `README.md` (instalación, uso, limitaciones, créditos, mejoras futuras), `docs/arquitectura.md` (diagramas Mermaid de arquitectura, ronda, fases y base de datos), `docs/manual-admin.md` (sin contraseñas), `docs/servicios-y-costos.md`, `docs/evidencias/README.md` (índice) y la tabla de criterios de aceptación al inicio de `docs/pruebas.md`.
 - **Interfaz de YouTube oculta (2026-11-17, verificado en vivo, capturas `fase9/pantalla-*.png` y `pantalla-1920x1080-inicio-video.png`):** el iframe es 1,25 veces más grande que el recuadro y va centrado (token `--video-zoom`), así el recuadro recorta la barra del título; la **portada va encima** del video y se desvanece solo cuando el reproductor está en PLAYING (arranque, buffering, pausa y final la muestran de nuevo). YouTube dibuja un ícono de pausa al centro en los primeros segundos, así que el video se destapa **4 s después** de entrar en PLAYING (`REVEAL_MS`); medido: la portada se oculta a los ~3 s de cargar y el primer cuadro destapado sale limpio. Sin scroll en 1920×1080 y 1366×768.
 - **Bloque 3:** checklist "Antes de la demo" (más abajo).
-- **Pendiente tuyo:** limpiar los datos de prueba (rondas, historial, votos) y hacer la ronda real con celulares.
+- **Ronda real en producción: HECHA (2026-11-17):** votos desde PC e iPhone (Safari), ronda cerrada con 2 votos y anuncio entre canciones; 3 evidencias en `docs/evidencias/demo/`, indexadas y marcadas como cumplidas en `docs/pruebas.md` (criterios 13, 14 y 15).
+- **Cambio chico (2026-11-17):** durante un anuncio y cuando el tiempo de la canción ya terminó, `/pantalla` muestra la portada en lugar del video (antes se veía el último cuadro congelado, visible en la evidencia). Compilado; no se probó en vivo porque requiere un anuncio real en pantalla.
+- **Pendiente tuyo:** limpiar los datos de prueba (rondas, historial, votos).
 
 ## Voz de la radio (2026-11-17): una sola ruta, dos idiomas, voces de mujer
 
@@ -213,7 +215,7 @@ Checklist. Lo marcado **(Supabase)** lo hace el usuario en el panel o el SQL Edi
 - [ ] `npm run verify:seed` (39/39 videos) y `npm run smoke` (todo OK) el día anterior.
 - [ ] Abrir `/pantalla` en **Microsoft Edge**, pulsar **Activar sonido** y dejar **una sola** pantalla abierta (`/pantalla?debug=1` para probar la voz Dalia y la de inglés).
 - [ ] Comprobar que el **QR** apunta a `radio-campus-five.vercel.app/votar` (no a localhost) y que el recuadro mide 280 px o más.
-- [ ] **Ronda real con 2–3 celulares** en producción: votar, esperar el cierre, capturar la pantalla de cada celular y la ronda cerrada, y guardarlas en `docs/evidencias/ronda-real/`.
+- [x] **Ronda real con celulares** en producción: hecha el 2026-11-17 (PC + iPhone con Safari, cierre con 2 votos); evidencias en `docs/evidencias/demo/`. Repetirla solo si se quiere mostrar con más dispositivos.
 - [ ] Mostrar el criterio de contexto: **Simular contexto** → escenarios → "Aplicar a la radio" → ver cambiar las opciones de la siguiente ronda → **Quitar simulación**.
 - [ ] Después de la demo: borrar los datos de prueba otra vez y quitar la simulación.
 

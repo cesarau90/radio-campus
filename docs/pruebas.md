@@ -13,12 +13,14 @@
 | 5 | La temperatura real llega al algoritmo (Open-Meteo) y sin clima se usa la playlist de respaldo | Cumplido | Ronda con `context_snapshot.temp = 22` y `used_fallback = false` (ESTADO.md); escenario "Sin dato de clima" en [`fase8/`](evidencias/fase8/) |
 | 6 | `/pantalla` reproduce la canción, abre la ronda, muestra el QR y los votos en vivo, anuncia la ganadora y la reproduce | Cumplido | [`fase6/`](evidencias/fase6/) (`bloque2c`, `resultado`) |
 | 7 | La pantalla **retoma** a media ronda al recargar y avisa si pierde la conexión | Cumplido | ESTADO.md (Fase 6); [`fase6/pantalla-1920x1080-sin-conexion.png`](evidencias/fase6/pantalla-1920x1080-sin-conexion.png) |
-| 8 | Un video que falla se registra y se salta; el anuncio no se encima con la canción | Cumplido en código y probado en parte | El salto del admin queda como "Saltada" en el historial ([`fase8/monitor-ronda2-calor-completo.png`](evidencias/fase8/monitor-ronda2-calor-completo.png)); el error de un video real no se provocó |
+| 8 | Un video que falla se registra y se salta | Cumplido en código y probado en parte | El salto del admin queda como "Saltada" en el historial ([`fase8/monitor-ronda2-calor-completo.png`](evidencias/fase8/monitor-ronda2-calor-completo.png)); el error de un video real no se provocó |
 | 9 | El admin puede gestionar canciones, eventos, anuncios y configuración, y **la configuración persiste** | Cumplido | [`fase7/`](evidencias/fase7/) (antes / guardado / recargado) |
 | 10 | Solo un administrador puede escribir; los anónimos no | Cumplido | `rls_write_access.sql`: 0 fallos en 5 actores (más abajo) |
 | 11 | Aceptable en celular (390 y 320 px), con contraste ≥ 4,5:1 y foco visible con teclado | Cumplido | [`fase5/`](evidencias/fase5/) (`contraste`, `foco-teclado`) |
 | 12 | Funciona en **producción** (Vercel) | Cumplido | `/votar`, `/pantalla` y `/admin` responden en https://radio-campus-five.vercel.app; [`fase5/rediseno/produccion-390x844-espera.png`](evidencias/fase5/rediseno/produccion-390x844-espera.png) |
-| 13 | **Ronda real con 2–3 celulares** en producción | **Pendiente** | Se hace antes de la demo (ver ESTADO.md → Antes de la demo) |
+| 13 | **Ronda completa desde varios dispositivos** en producción: votos desde una PC y un iPhone, cierre con resultado y reproducción de la siguiente | **Cumplido** (2026-11-17) | [`demo/pantalla-ronda-cerrada-y-anuncio-produccion.png`](evidencias/demo/pantalla-ronda-cerrada-y-anuncio-produccion.png) (ronda cerrada con 2 votos), [`demo/votar-voto-registrado-pc-produccion.png`](evidencias/demo/votar-voto-registrado-pc-produccion.png) |
+| 14 | **Anuncio entre canciones**: la radio dice y muestra un anuncio aprobado, sin encimarse con la música | **Cumplido** (2026-11-17) | [`demo/pantalla-ronda-cerrada-y-anuncio-produccion.png`](evidencias/demo/pantalla-ronda-cerrada-y-anuncio-produccion.png) (anuncio "Bienvenidos a Radio Campus" con la ronda cerrada) |
+| 15 | **Voto desde un iPhone con Safari** (abierto desde la cámara con el QR) en producción | **Cumplido** (2026-11-17) | [`demo/votar-voto-registrado-iphone-safari-produccion.png`](evidencias/demo/votar-voto-registrado-iphone-safari-produccion.png); el bug que lo impedía y su arreglo, en la sección de Safari más abajo |
 
 ## Sesión anónima en Safari/WebKit (2026-11-17)
 
@@ -34,7 +36,7 @@ Prueba en **WebKit (iPhone 13 emulado, Playwright)** llamando a `castVote` con u
 | La sesión se pierde por completo | — | OK (`ensureSession` crea otra) |
 | El servidor responde 401/42501 a la primera llamada | — | OK (reintento con sesión nueva) |
 
-Pendiente: repetir la prueba con un iPhone real antes de la demo.
+**Prueba con un iPhone real (2026-11-17):** Safari abierto desde la cámara con el QR, en producción: el voto se registró ([`evidencias/demo/votar-voto-registrado-iphone-safari-produccion.png`](evidencias/demo/votar-voto-registrado-iphone-safari-produccion.png)).
 
 ## Pruebas de base de datos
 

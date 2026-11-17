@@ -10,6 +10,7 @@ Capturas y registros que respaldan lo que hace cada fase. Todas se tomaron con e
 | [`fase7/`](fase7/) | `/admin` CRUDs | Login, canciones (alta con "Comprobar en YouTube", edición, desactivación), eventos y temas, anuncios (crear y aprobar) y **configuración que persiste tras recargar** (antes, guardado y recargado) | `admin-login-1366x768.png`, `admin-canciones-*.png`, `admin-eventos-*.png`, `admin-anuncios-*.png`, `admin-config-antes/guardado/recargado-1366x768.png` |
 | [`fase8/`](fase8/) | `/admin` monitor y simulador | **Criterio "un cambio de contexto cambia las opciones"**: comparación de 6 escenarios y rondas reales con simulación; monitor con contexto de la ronda, historial y gráfica; pausa; simulación activa y quitada | `simular-comparacion-completa-1366.png`, `monitor-ronda1-examenes-completo.png`, `monitor-ronda2-calor-completo.png`, `monitor-pausa-1366x768.png`, `simulacion-activa-1366x768.png` |
 | [`fase9/`](fase9/) | Pulido | "Borrar" con estilo de peligro y confirmación, acciones de canciones en un renglón, configuración en 2 columnas, `/pantalla` sin hueco entre opciones y QR, `/votar` sin parpadeo al recargar con el voto emitido; **video de `/pantalla` sin la interfaz de YouTube** (recortado y con la portada encima mientras no suena) | `admin-borrar-confirmacion-1366x768.png`, `admin-canciones-1366x768.png`, `admin-config-2-columnas-1366x768.png`, `pantalla-1920x1080.png`, `pantalla-1920x1080-inicio-video.png`, `pantalla-1366x768.png`, `votar-recarga-con-voto-390x844.png` |
+| [`demo/`](demo/) | **Ronda real en producción** (2026-11-17) | La radio funcionando de punta a punta en https://radio-campus-five.vercel.app con varios dispositivos: voto registrado desde una **PC** y desde un **iPhone con Safari** (abierto desde la cámara con el QR), y la **ronda cerrada con 2 votos** en `/pantalla` con el **anuncio de bienvenida** dicho entre canciones | `votar-voto-registrado-pc-produccion.png`, `votar-voto-registrado-iphone-safari-produccion.png`, `pantalla-ronda-cerrada-y-anuncio-produccion.png` |
 
 ## Otras evidencias (no son capturas)
 
@@ -20,4 +21,4 @@ Capturas y registros que respaldan lo que hace cada fase. Todas se tomaron con e
 
 ## Pendiente
 
-- **Ronda real con 2–3 celulares** en producción (con el diseño final): capturar la pantalla de cada celular y la vista de ronda cerrada, y guardarlas en una carpeta nueva (por ejemplo `ronda-real/`). Ver la lista "Antes de la demo" en [ESTADO.md](../ESTADO.md#antes-de-la-demo).
+- No hay capturas pendientes. Antes de la demo solo queda la limpieza de los datos de prueba (ver la lista "Antes de la demo" en [ESTADO.md](../ESTADO.md#antes-de-la-demo)).
