@@ -24,6 +24,13 @@
 | 8 `/admin` operación | pendiente | |
 | 9 Pulido y documentación | pendiente | |
 
+## Voz de la radio (2026-11-17): una sola ruta y dos idiomas
+
+- **Una sola función:** `useSpeech.speak` es el único lugar que crea `SpeechSynthesisUtterance` (`/pantalla`, "Probar voz" del admin y el desbloqueo con el clic). Antes, si Edge aún no había cargado a Jorge en la primera frase, caía a la voz por defecto (posible voz de mujer): ahora, en la primera frase de la sesión, espera hasta 2,5 s a que aparezca una voz Natural, y el utterance de desbloqueo usa la misma voz elegida (silencioso).
+- **Dos idiomas:** `src/lib/speech.ts` (puro): `guessLang` (género latino/regional/reggaetón/banda/cumbia, o acentos/ñ → español; si no, inglés) y `nowPlayingSegments` / `newRoundSegments` / `roundResultSegments` parten el anuncio en tramos: lo fijo en español con Jorge (es-MX Natural → es-MX → es-US → es) y el título/artista en inglés con voz en-US masculina (Andrew → Guy → Brian → en-US Natural → en-US → en). Probado con listas de voces simuladas (todas las prioridades); el audio real solo se puede oír en Edge.
+- **Límite conocido de la heurística:** una canción en español sin acentos y en un género no latino (p. ej. "Despacito", pop) se dice con la voz en inglés.
+- **Debug:** `/pantalla?debug=1` tiene "Probar voz" y "Probar canción en inglés" ("Ahora suena Shape of You de Ed Sheeran"). En consola: `[voz] voces es-*`, `[voz] voces en-*` y `[voz] elegidas → es: … | en: …`.
+
 ## Fase 8 (`/admin` monitor, controles y simular contexto): implementada y verificada, sin commit (2026-11-17)
 
 - **Migración nueva (ya aplicada por el usuario en el SQL Editor):** `supabase/migrations/20261117000100_admin_preview_pick.sql`, función `admin_preview_pick(hora, temp, tipo de evento, tema)`: solo lectura, solo `is_admin()`, no crea rondas; devuelve contexto, cómo se eligió (reglas, tamaño del conjunto elegible, respaldo) y las 2 canciones. Quien monte la base desde cero debe correrla después de las otras 5 migraciones.

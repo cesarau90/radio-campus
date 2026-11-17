@@ -9,6 +9,7 @@ import {
   startRound,
 } from '../lib/api'
 import { playSeconds } from '../lib/playback'
+import { newRoundSegments, nowPlayingSegments, roundResultSegments } from '../lib/speech'
 import { weatherLabel } from '../lib/weather'
 import { formatClock } from '../lib/time'
 import { percentages } from '../lib/votes'
@@ -202,14 +203,13 @@ export function usePantalla() {
     if (view === 'voting' && songA && songB && spoken.current.open !== round.id) {
       spoken.current.open = round.id
       if (nowMs() - new Date(round.starts_at).getTime() < 15_000) {
-        void speak(`Ya puedes votar desde tu celular. Opción A: ${songA.title}. Opción B: ${songB.title}.`)
+        void speak(newRoundSegments(songA, songB))
       }
     }
     if (view === 'result' && winner && spoken.current.result !== round.id) {
       spoken.current.result = round.id
       if (nowMs() - new Date(round.ends_at).getTime() < 30_000) {
-        const tie = round.resolution === 'empate' ? 'Hubo empate. ' : ''
-        void speak(`Ronda cerrada. ${tie}Sigue ${winner.title}, de ${winner.artist}.`)
+        void speak(roundResultSegments(winner, round.resolution === 'empate'))
       }
     }
   }, [view, round, winner, songA, songB, nowMs, speak])
@@ -269,6 +269,7 @@ export function usePantalla() {
     debug: new URLSearchParams(window.location.search).get('debug') === '1',
     voiceName: speech.voiceName,
     testVoice: () => void speak('Hola, soy la voz de Radio Campus. Ya puedes votar desde tu celular.'),
+    testEnglishSong: () => void speak(nowPlayingSegments('Ahora suena', { title: 'Shape of You', artist: 'Ed Sheeran', genre: 'pop' })),
     clockText,
     tickerItems,
     playerError: player.apiError,

@@ -1,30 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { isNaturalVoice, mergeSegments, pickVoiceFor, type Lang, type Segment } from '../lib/speech'
 
 const MS_PER_CHAR = 70 // lectura pausada, para estimar cuánto dura un texto
 const GRACE_MS = 5000
 const VOICES_WAIT_MS = 2000 // tope para esperar a que el navegador cargue sus voces
+const NATURAL_WAIT_MS = 2500 // solo la primera vez: tope para esperar a que Edge cargue las voces "Natural"
+const NATURAL_POLL_MS = 200
 
 /** Cuánto tarda en leerse un texto (margen incluido); sirve de tope si la voz no avisa que terminó. */
 export function readingMs(text: string): number {
   return text.length * MS_PER_CHAR + GRACE_MS
-}
-
-const norm = (lang: string) => lang.replace('_', '-').toLowerCase()
-const isNatural = (v: SpeechSynthesisVoice) => /natural/i.test(v.name)
-
-/**
- * Mejor voz disponible, en este orden: "Jorge" Natural → cualquier es-MX Natural (p. ej. Dalia en Edge) →
- * cualquier es-MX → es-US → cualquier español.
- */
-export function pickVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
-  const mx = voices.filter((v) => norm(v.lang) === 'es-mx')
-  return (
-    voices.find((v) => /jorge/i.test(v.name) && isNatural(v)) ??
-    mx.find(isNatural) ??
-    mx[0] ??
-    voices.find((v) => norm(v.lang) === 'es-us') ??
-    voices.find((v) => norm(v.lang).startsWith('es'))
-  )
 }
 
 /** Las voces se cargan en segundo plano: si todavía no hay, se espera el evento voiceschanged (con tope). */
@@ -43,30 +28,52 @@ function loadVoices(): Promise<SpeechSynthesisVoice[]> {
   })
 }
 
-let chosen: SpeechSynthesisVoice | undefined
+// Las voces elegidas viven a nivel de módulo: todo lo que habla (pantalla y admin) comparte la misma elección.
+const chosen: Partial<Record<Lang, SpeechSynthesisVoice>> = {}
 let lastLogged = ''
+let waitedForNatural = false
 
-/** Elige otra vez entre las voces actuales y lo cuenta en consola (lista de es-* y cuál quedó) solo si algo cambió. */
-function choose(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
-  chosen = pickVoice(voices)
-  const spanish = voices.filter((v) => norm(v.lang).startsWith('es'))
-  const line = `${spanish.map((v) => `${v.name} (${v.lang})`).join(' | ')} => ${chosen ? `${chosen.name} (${chosen.lang})` : 'ninguna'}`
+/** Elige de nuevo la voz de cada idioma con las voces actuales y lo cuenta en consola (solo si algo cambió). */
+function chooseAll(voices: SpeechSynthesisVoice[]) {
+  chosen.es = pickVoiceFor('es', voices)
+  chosen.en = pickVoiceFor('en', voices)
+  const fmt = (v?: SpeechSynthesisVoice) => (v ? `${v.name} (${v.lang})` : 'ninguna')
+  const line = `es: ${fmt(chosen.es)} | en: ${fmt(chosen.en)}`
   if (line !== lastLogged) {
     lastLogged = line
-    console.info(`[voz] voces es-*: ${spanish.length ? spanish.map((v) => `${v.name} (${v.lang})`).join(' | ') : 'ninguna'}`)
-    console.info(`[voz] elegida: ${chosen ? `${chosen.name} (${chosen.lang})` : 'ninguna (se usa la del navegador)'}`)
+    const list = (p: string) => voices.filter((v) => v.lang.toLowerCase().startsWith(p)).map((v) => `${v.name} (${v.lang})`)
+    console.info(`[voz] voces es-*: ${list('es').join(' | ') || 'ninguna'}`)
+    console.info(`[voz] voces en-*: ${list('en').join(' | ') || 'ninguna'}`)
+    console.info(`[voz] elegidas → ${line}`)
   }
-  return chosen
 }
 
 /**
- * Voz de /pantalla con speechSynthesis (gratis, sin servidor). `speak` devuelve una promesa que se cumple
- * cuando termina de hablar (o falla, o se agota el tope): quien la espera nunca se queda colgado.
- * Los textos se encolan solos, así que nunca se encimarán. `speaking` sirve para bajar el volumen de la música.
- * Las voces "Online (Natural)" de Edge cargan tarde: se vuelve a elegir en cada voiceschanged y antes de cada
- * frase si todavía no hay una Natural. Se asignan `voice` y `lang` de la voz elegida para que el navegador no use otra.
- * Chrome exige una interacción previa con la página: si bloquea la voz, `blocked` pasa a true y `unlock` (desde un clic) la activa.
- * Sin soporte de voz, solo se espera lo que tardaría en leerse (el texto también se muestra en pantalla).
+ * Edge carga sus voces "Online (Natural)" tarde. En la PRIMERA frase de la sesión, si todavía no hay una Natural en español,
+ * se espera un poco a que lleguen (con tope) para no arrancar con la voz por defecto, que puede ser de mujer.
+ */
+async function ensureVoices(): Promise<void> {
+  let voices = await loadVoices()
+  chooseAll(voices)
+  if (!isNaturalVoice(chosen.es) && !waitedForNatural) {
+    waitedForNatural = true
+    const until = Date.now() + NATURAL_WAIT_MS
+    while (Date.now() < until && !isNaturalVoice(chosen.es)) {
+      await new Promise((r) => setTimeout(r, NATURAL_POLL_MS))
+      voices = window.speechSynthesis.getVoices()
+      chooseAll(voices)
+    }
+  }
+}
+
+/**
+ * Voz de la radio con speechSynthesis (gratis, sin servidor). ÚNICO lugar donde se crean `SpeechSynthesisUtterance`:
+ * /pantalla y el "Probar voz" del admin pasan por `speak`, así que siempre se elige la voz igual.
+ * `speak` acepta un texto en español o una lista de tramos con idioma ({ text, lang }): cada tramo se dice con la voz
+ * de su idioma (Jorge para español; Andrew, Guy o Brian para inglés) y todos se encolan sin encimarse.
+ * Devuelve una promesa que se cumple cuando termina el último tramo (o falla, o se agota el tope): nadie se queda colgado.
+ * `speaking` sirve para bajar el volumen de la música. Chrome exige una interacción previa con la página: si bloquea la voz,
+ * `blocked` pasa a true y `unlock` (desde un clic) la activa. Sin soporte de voz, solo se espera lo que tardaría en leerse.
  */
 export function useSpeech() {
   const [speaking, setSpeaking] = useState(false)
@@ -79,8 +86,8 @@ export function useSpeech() {
     if (!('speechSynthesis' in window)) return
     const synth = window.speechSynthesis
     const refresh = () => {
-      const v = choose(synth.getVoices())
-      setVoiceName(v ? v.name : null)
+      chooseAll(synth.getVoices())
+      setVoiceName(chosen.es ? chosen.es.name : null)
     }
     synth.addEventListener('voiceschanged', refresh)
     const first = setTimeout(refresh, 0)
@@ -90,13 +97,15 @@ export function useSpeech() {
     }
   }, [])
 
-  const speak = useCallback((text: string): Promise<void> => {
+  const speak = useCallback((input: string | Segment[]): Promise<void> => {
+    const segments = mergeSegments(typeof input === 'string' ? [{ text: input, lang: 'es' }] : input)
     return new Promise<void>((resolve) => {
       pending.current += 1
       setSpeaking(true)
       let done = false
-      // Tope: lo que tardaría en leerse, contando lo que ya está en cola (más la espera de las voces).
-      const cap = setTimeout(() => finish(), readingMs(text) * Math.max(1, pending.current) + VOICES_WAIT_MS)
+      // Tope: lo que tardaría en leerse todo, contando lo que ya está en cola (más la espera de las voces).
+      const total = segments.reduce((n, s) => n + readingMs(s.text), 0)
+      const cap = setTimeout(() => finish(), total * Math.max(1, pending.current) + VOICES_WAIT_MS + NATURAL_WAIT_MS)
       function finish() {
         if (done) return
         done = true
@@ -105,26 +114,35 @@ export function useSpeech() {
         if (pending.current <= 0) setSpeaking(false)
         resolve()
       }
-      if (!('speechSynthesis' in window)) return
-      void loadVoices().then((voices) => {
+      if (!('speechSynthesis' in window) || segments.length === 0) {
+        if (segments.length === 0) finish()
+        return
+      }
+      void ensureVoices().then(() => {
         if (done) return
-        // Si todavía no hay una Natural, se vuelve a elegir con lo que haya justo ahora.
-        const voice = chosen && isNatural(chosen) ? chosen : choose(voices)
-        const utterance = new SpeechSynthesisUtterance(text)
-        utterance.rate = 0.95
-        utterance.pitch = 1.0
-        if (voice) {
-          utterance.voice = voice
-          utterance.lang = voice.lang // si solo se pone lang, el navegador puede escoger otra voz
-        } else {
-          utterance.lang = 'es-MX'
+        let left = segments.length
+        const oneDone = () => {
+          left -= 1
+          if (left <= 0) finish()
         }
-        utterance.onend = finish
-        utterance.onerror = (e) => {
-          if (e.error === 'not-allowed') setBlocked(true)
-          finish()
+        for (const seg of segments) {
+          const voice = chosen[seg.lang]
+          const utterance = new SpeechSynthesisUtterance(seg.text)
+          utterance.rate = 0.95
+          utterance.pitch = 1.0
+          if (voice) {
+            utterance.voice = voice
+            utterance.lang = voice.lang // si solo se pone lang, el navegador puede escoger otra voz
+          } else {
+            utterance.lang = seg.lang === 'es' ? 'es-MX' : 'en-US'
+          }
+          utterance.onend = oneDone
+          utterance.onerror = (e) => {
+            if (e.error === 'not-allowed') setBlocked(true)
+            oneDone()
+          }
+          window.speechSynthesis.speak(utterance)
         }
-        window.speechSynthesis.speak(utterance)
       })
     })
   }, [])
@@ -132,7 +150,14 @@ export function useSpeech() {
   const unlock = useCallback(() => {
     if (!('speechSynthesis' in window)) return
     setBlocked(false)
-    window.speechSynthesis.speak(new SpeechSynthesisUtterance(' ')) // el clic habilita la voz para el resto de la sesión
+    // El clic habilita la voz para el resto de la sesión. Silencioso y con la misma voz elegida (nunca la voz por defecto).
+    const u = new SpeechSynthesisUtterance(' ')
+    u.volume = 0
+    if (chosen.es) {
+      u.voice = chosen.es
+      u.lang = chosen.es.lang
+    }
+    window.speechSynthesis.speak(u)
   }, [])
 
   return { speak, speaking, blocked, unlock, voiceName }

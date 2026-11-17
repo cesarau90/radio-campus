@@ -171,6 +171,9 @@ export default function PantallaView(m: PantallaModel) {
           <button type="button" onClick={m.testVoice}>
             Probar voz
           </button>
+          <button type="button" onClick={m.testEnglishSong}>
+            Probar canción en inglés
+          </button>
           <span className="mono">{m.voiceName ?? 'sin voz en español'}</span>
         </div>
       )}
