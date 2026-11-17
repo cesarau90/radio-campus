@@ -53,7 +53,7 @@ La ronda `00000000-0000-4000-8000-0000000000a8` y sus votos de prueba se elimina
 - **Pendiente 1 hecho:** panel de espera con borde de 1 px (`--color-line`), `width: calc(100% - 2 * var(--space-4))` y `--radius-lg`. Contraste medido contra el píxel más claro de la foto: texto 11,20:1, secundario 5,88:1 (borde 3,47:1 contra la foto). Dial: `margin-bottom: calc(var(--dial-size) * 0.35)` deja 12 px libres entre el anillo (escala 1,7) y el panel. Capturas `*-espera-borde.png` y `*-espera-dial.png` (390 y 1920).
 - **Pendiente 2 hecho (en código):** los 3 mensajes del voto y el de empate están bien. Nota: en empate, quien votó por la ganadora ve "Tu voto ayudó a ganar." junto al texto del desempate; se dejó así.
 - **Pendiente 3:** ronda `…a9` **ya usada y limpiada** (rounds 0, votes 0). **El siguiente id de prueba es `…b0`.** Ronda cerrada real capturada (`*-cerrada-real.png`, 390 y 1920; caso "Tu voto ayudó a ganar."). **Contador urgente real: omitido por decisión**; se queda la captura inyectada. Los casos "votó por la otra" y "no votó" siguen sin captura real.
-- **Pendiente 4:** build y lint pasan; commit y push a la espera del OK del usuario.
+- **Pendiente 4 hecho:** commit `e36a851` en `main`; Vercel "success" y producción sirve los mismos `index-*.js/css` que el build local. Captura: `produccion-390x844-espera.png`. Fase 6 desbloqueada.
 
 ## Pendientes del rediseño (histórico; 1–3 cerrados arriba)
 
