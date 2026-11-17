@@ -4,7 +4,9 @@ import AdminLogin from './AdminLogin'
 import AnnouncementsPanel from './AnnouncementsPanel'
 import EventsPanel from './EventsPanel'
 import { DialMark } from './icons'
+import MonitorPanel from './MonitorPanel'
 import SettingsForm from './SettingsForm'
+import SimulatorPanel from './SimulatorPanel'
 import SongsPanel from './SongsPanel'
 import StatusNotice from './StatusNotice'
 
@@ -55,7 +57,9 @@ export default function AdminView(m: AdminModel) {
       </nav>
 
       <main className="ad-main">
+        {m.tab === 'monitor' && <MonitorPanel monitor={m.monitor} />}
         {m.tab === 'canciones' && <SongsPanel songs={m.songs} />}
+        {m.tab === 'contexto' && <SimulatorPanel sim={m.simulator} />}
         {m.tab === 'config' && <SettingsForm settings={m.settings} />}
         {m.tab === 'eventos' && <EventsPanel events={m.events} themes={m.songs.suggestions.themes} nowMs={m.nowMs} />}
         {m.tab === 'anuncios' && <AnnouncementsPanel announcements={m.announcements} nowMs={m.nowMs} />}

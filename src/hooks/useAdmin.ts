@@ -2,16 +2,20 @@ import { useEffect, useState } from 'react'
 import { useAdminSession } from './useAdminSession'
 import { useAdminAnnouncements } from './useAdminAnnouncements'
 import { useAdminEvents } from './useAdminEvents'
+import { useAdminMonitor } from './useAdminMonitor'
 import { useAdminSettings } from './useAdminSettings'
+import { useAdminSimulator } from './useAdminSimulator'
 import { useAdminSongs } from './useAdminSongs'
 import { useSpeech } from './useSpeech'
 
-export type AdminTab = 'canciones' | 'eventos' | 'anuncios' | 'config'
+export type AdminTab = 'monitor' | 'canciones' | 'eventos' | 'anuncios' | 'contexto' | 'config'
 
 export const ADMIN_TABS: Array<{ id: AdminTab; label: string }> = [
+  { id: 'monitor', label: 'Monitor' },
   { id: 'canciones', label: 'Canciones' },
   { id: 'eventos', label: 'Eventos y temas' },
   { id: 'anuncios', label: 'Anuncios' },
+  { id: 'contexto', label: 'Simular contexto' },
   { id: 'config', label: 'Configuración' },
 ]
 
@@ -21,11 +25,13 @@ export const ADMIN_TABS: Array<{ id: AdminTab; label: string }> = [
  */
 export function useAdmin() {
   const auth = useAdminSession()
-  const [tab, setTab] = useState<AdminTab>('canciones')
+  const [tab, setTab] = useState<AdminTab>('monitor')
   const enabled = auth.isAdmin
   const settings = useAdminSettings(enabled)
   const songs = useAdminSongs(enabled)
   const events = useAdminEvents(enabled, songs.themeCounts)
+  const simulator = useAdminSimulator(enabled)
+  const monitor = useAdminMonitor(enabled && tab === 'monitor')
   const speech = useSpeech() // para probar la voz de los anuncios
   const announcements = useAdminAnnouncements(enabled, speech.speak)
 
@@ -49,6 +55,8 @@ export function useAdmin() {
     songs,
     events,
     announcements,
+    simulator,
+    monitor,
     nowMs,
   }
 }

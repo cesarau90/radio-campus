@@ -1,10 +1,13 @@
 export type TieRule = 'aleatorio' | 'menos_reproducida' | 'opcion_a'
 export type NoVotesRule = 'aleatorio' | 'respaldo'
 
+/** Simulación de contexto que el admin guarda en settings.context_override; start_round la usa en lugar de la hora, el clima y el evento reales. */
 export interface ContextOverride {
   hour?: number
   temp?: number
-  event_type?: 'festividad' | 'examenes' | 'evento'
+  /** 'ninguno' apaga también el evento real del calendario. */
+  event_type?: 'festividad' | 'examenes' | 'evento' | 'ninguno'
+  theme?: string
 }
 
 export interface Settings {

@@ -24,6 +24,17 @@
 | 8 `/admin` operación | pendiente | |
 | 9 Pulido y documentación | pendiente | |
 
+## Fase 8 (`/admin` monitor, controles y simular contexto): implementada y verificada, sin commit (2026-11-17)
+
+- **Migración nueva (ya aplicada por el usuario en el SQL Editor):** `supabase/migrations/20261117000100_admin_preview_pick.sql`, función `admin_preview_pick(hora, temp, tipo de evento, tema)`: solo lectura, solo `is_admin()`, no crea rondas; devuelve contexto, cómo se eligió (reglas, tamaño del conjunto elegible, respaldo) y las 2 canciones. Quien monte la base desde cero debe correrla después de las otras 5 migraciones.
+- **Qué hay en `/admin`:** pestaña **Monitor** (`useAdminMonitor`, `MonitorPanel`): qué suena, ronda en vivo con votos A/B y cuenta regresiva, contexto con el que se creó la ronda (marca "simulado"), gráfica de votos de las últimas 10 rondas, últimas 15 reproducciones, y controles **pausar/reanudar**, **saltar canción** (`skip_requested_at`) y **cerrar la ronda ahora** (con confirmación). Pestaña **Simular contexto** (`useAdminSimulator`, `SimulatorPanel`): 6 escenarios de ejemplo, escenario propio (hora, temperatura, evento, tema), comparación de los últimos 6 escenarios, **Aplicar a la radio** (guarda `settings.context_override`) y **Quitar simulación**; aviso "Simulación activa" en ambas pestañas.
+- **Criterio "un cambio de contexto cambia las opciones": cumplido, con evidencia** (`docs/evidencias/fase8/`):
+  - Vista previa (`simular-comparacion-completa-1366.png`): Madrugada → La Bikina / La Puerta Negra (regional, energía 2–4); Mañana fresca → Experience / Primera Cita (acogedor/calmado); Tarde calurosa → One More Time / This Is What You Came For (electrónica, fresco/alegre, energía 3–5); Exámenes → Nocturne Op. 9 / Clair de Lune (solo instrumental, energía 1–2); Navidad → Feliz Navidad / It's Beginning to Look a Lot Like Christmas (tema navidad); Sin clima → respaldo.
+  - **Ronda real:** con la simulación Exámenes (10:00, 24 °C) `/pantalla` creó una ronda con **Nuvole Bianche / Gymnopédie No. 1**; al cambiar a Tarde calurosa, cerrar la ronda y saltar la canción, la siguiente ronda real fue **Hymn for the Weekend / Uptown Funk** (`monitor-ronda1-examenes-*.png`, `monitor-ronda2-calor-*.png`; `context_snapshot` con `overridden`).
+  - Pausa: chip "Radio en pausa" en el monitor y `/pantalla` en "Votación en pausa"; al reanudar vuelve (`monitor-pausa-1366x768.png`). Salto: queda "Saltada" en el historial. La simulación se quitó y se confirmó en la base (`context_override` null, `paused` false).
+- **Datos de prueba creados por esta verificación** (rondas, historial y `playback_state`; y los de la verificación en producción de `/pantalla`): se limpian por id antes de la ronda con celulares (SQL en la conversación). `settings.skip_requested_at` quedó con un valor de la prueba (inofensivo; el SQL lo limpia).
+- **Pendiente para la Fase 9:** el panel Monitor y los demás siguen sin versión de celular pulida; el `/admin` guarda la simulación sin pedir confirmación (avisa con banner).
+
 ## Fase 7 (`/admin` CRUDs): implementada, sin commit (2026-11-17)
 
 - **Commit pendiente:** Fase 6 está en `main` (`47b89f9`, desplegada; `/pantalla` carga en producción con la URL de Vercel en el QR). **Este ESTADO.md va junto con la Fase 7**, no por separado (decisión del usuario).

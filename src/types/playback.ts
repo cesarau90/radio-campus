@@ -11,3 +11,13 @@ export interface PlaybackState {
 }
 
 export type PlayStatus = 'ok' | 'error' | 'skipped'
+
+/** Una fila de play_history (solo la lee el admin): qué sonó, cuándo y cómo terminó. */
+export interface PlayHistoryRow {
+  id: string
+  song_id: string
+  played_at: string
+  round_id: string | null
+  status: PlayStatus
+  note: string | null
+}

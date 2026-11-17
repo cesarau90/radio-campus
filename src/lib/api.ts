@@ -10,10 +10,12 @@ import type {
   CampusEventInput,
   PlaybackPhase,
   PlaybackState,
+  PlayHistoryRow,
   PlayStatus,
   Round,
   RoundOption,
   Settings,
+  PreviewResult,
   Song,
   SongInput,
   VoteResult,
@@ -197,4 +199,35 @@ export async function deleteAnnouncement(id: string): Promise<void> {
 
 export async function updateSettings(patch: Partial<Omit<Settings, 'id'>>): Promise<Settings> {
   return unwrap(await supabase.from('settings').update(patch).eq('id', 1).select().single<Settings>())
+}
+
+/** Las 2 canciones que el algoritmo ofrecería con un contexto dado (solo lectura, solo admin; no crea rondas). */
+export async function previewPick(input: {
+  hour: number | null
+  temp: number | null
+  eventType: string | null
+  theme: string | null
+}): Promise<PreviewResult> {
+  return unwrap(
+    await supabase.rpc('admin_preview_pick', {
+      p_hour: input.hour,
+      p_temp: input.temp,
+      p_event_type: input.eventType,
+      p_theme: input.theme,
+    }),
+  ) as PreviewResult
+}
+
+/** Reproducciones más recientes (RLS: solo el admin lee play_history). */
+export async function fetchPlayHistory(limit: number): Promise<PlayHistoryRow[]> {
+  return unwrap(
+    await supabase.from('play_history').select('*').order('played_at', { ascending: false }).limit(limit).returns<PlayHistoryRow[]>(),
+  )
+}
+
+/** Rondas cerradas más recientes, para la gráfica de votos. */
+export async function fetchRecentClosedRounds(limit: number): Promise<Round[]> {
+  return unwrap(
+    await supabase.from('rounds').select('*').eq('status', 'closed').order('starts_at', { ascending: false }).limit(limit).returns<Round[]>(),
+  )
 }
