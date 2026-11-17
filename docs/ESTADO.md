@@ -1,12 +1,12 @@
 # Estado del proyecto (para retomar)
 
-Última actualización: 2026-11-17, al cierre del día (Fase 10 empezada y en pausa). Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
+Última actualización: 2026-11-17, al cierre del día (Fase 10 hecha y en `main`). Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
 
 ## Dónde vamos
 
-**Fases 0 a 9 hechas, desplegadas y verificadas. La Fase 10 ("requisitos faltantes" que salieron de la auditoría) está empezada y EN PAUSA: hay código sin commit y sin probar** (ver "Fase 10" más abajo). Producción: **https://radio-campus-five.vercel.app** (repo público: https://github.com/cesarau90/radio-campus). Cada push a `main` se publica solo en Vercel (cada commit se comprobó con el estado "success" y los mismos archivos `index-*.js/css` que el build local).
+**Fases 0 a 10 hechas, desplegadas y verificadas.** La Fase 10 ("requisitos faltantes" de la auditoría: reglas, playlists, respaldo, tableta, estadísticas y tarjeta "Siguiente") se probó en vivo con sesión de admin y se fusionó a `main` (commits `2a7f6a4` y `41b1d43`); Vercel en "success" y `/pantalla`, `/votar` y `/admin` responden 200 en producción. Producción: **https://radio-campus-five.vercel.app** (repo público: https://github.com/cesarau90/radio-campus).
 
-**Lo que falta para cerrar el proyecto:** terminar la Fase 10 (reglas, playlists, respaldo, tableta, estadísticas, tarjeta "Siguiente"), y antes de la demo la limpieza de datos de prueba (ver "Antes de la demo"). La ronda real en producción con PC e iPhone ya se hizo (evidencias en `docs/evidencias/demo/`).
+**Lo que falta:** solo la limpieza de datos de prueba y la checklist de "Antes de la demo". La tarjeta "Siguiente" aún no se ha visto con una ronda real.
 
 | Fase | Estado | Commit |
 |---|---|---|
@@ -24,7 +24,7 @@
 | 9 Pulido y documentación (+ voces de mujer y heurística de idioma) | hecha, desplegada | `b3f9d98` |
 | Arreglo del voto en Safari (`cast_vote` 401) | hecho, desplegado, verificado en un iPhone real | `6e75d06` |
 | Evidencias de la ronda real + portada durante anuncios | hecho, desplegado | `e757429` |
-| **10 Requisitos faltantes** | **en pausa**: código parcial sin commit (ver abajo) | — |
+| 10 Requisitos faltantes | hecha, probada en vivo, fusionada a `main` y desplegada ✅ | `2a7f6a4`, `41b1d43` |
 
 ## Lo hecho hoy (2026-11-17)
 
@@ -56,7 +56,9 @@
 
 Total aproximado de lo que falta: 13–16 h. Orden sugerido: 1, 2 y 9 (los más claros frente al enunciado), luego 5, 4 y 3.
 
-## Fase 10: requisitos faltantes (plan y estado a la pausa)
+## Fase 10: requisitos faltantes ✅ (hecha; lo de abajo es el plan original)
+
+**Resultado (2026-11-17):** Reglas, Playlists y Respaldo probados en vivo (regla restaurada a 2–4, respaldo regresado a `respaldo`, reimport sin duplicados: 7 reglas, 2 eventos, 1 anuncio, 2 playlists, 15 canciones antes y después); tableta a 768×1024 sin desborde en las 7 pestañas medidas y casillas de 44 px; estadísticas y tarjeta "Siguiente" en el Monitor; manual y README al día. Capturas en `docs/evidencias/fase10/`.
 
 Versiones sencillas, reutilizando los componentes del admin. **Estado real del árbol de trabajo (sin commit):** compila (`npm run build` y `npm run lint` pasan), **nada de esto está probado en vivo** y **no se ha subido a `main`** a propósito.
 
@@ -265,6 +267,7 @@ Checklist. Lo marcado **(Supabase)** lo hace el usuario en el panel o el SQL Edi
 - [ ] **Aprobar el anuncio "Bienvenidos a Radio Campus"** (Anuncios → Aprobar; nace sin aprobar).
 - [ ] **Poner "Máximo por canción" en 90** (Configuración) para que las rondas no duren minutos.
 - [ ] Revisar en **Monitor** que no diga *Simulación activa* ni *Radio en pausa*.
+- [ ] **Verificar la tarjeta "Siguiente" del Monitor con una ronda real** (abierta con y sin votos, y cerrada); solo se probó con la base vacía.
 - [ ] Opcional: crear un evento propio de la semana de la demo (Eventos y temas).
 
 **Equipo de la TV y celulares**
