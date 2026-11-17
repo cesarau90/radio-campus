@@ -37,16 +37,24 @@ export function useVotar() {
   const [stampedRound, setStampedRound] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [voteError, setVoteError] = useState<string | null>(null)
+  // La primera consulta de "mi voto" ya terminó (con o sin voto). Hasta entonces se muestra "Sintonizando…" y no las opciones.
+  const [voteChecked, setVoteChecked] = useState(false)
+  // Si al abrir la página todavía no había ronda, no hay voto que esperar (y cuando llegue una ronda nueva nadie ha votado en ella).
+  const [openedWithRound, setOpenedWithRound] = useState<boolean | null>(null)
+  if (openedWithRound === null && !live.loading) setOpenedWithRound(!!live.round)
 
   useEffect(() => {
     if (!roundId || !session.ready) return
     let cancelled = false
     fetchMyVote(roundId).then(
       (option) => {
-        if (!cancelled && option) setMine({ roundId, option })
+        if (cancelled) return
+        if (option) setMine({ roundId, option })
+        setVoteChecked(true)
       },
       () => {
         /* si falla, se enterará al votar: cast_vote responde "ya votaste" */
+        if (!cancelled) setVoteChecked(true)
       },
     )
     return () => {
@@ -99,6 +107,7 @@ export function useVotar() {
   else if (!session.ready || live.loading || !clock.ready) view = 'connecting'
   else if (!live.round) view = 'no-round'
   else if (!current) view = 'connecting' // la ronda ya llegó, faltan sus canciones
+  else if (openedWithRound && !voteChecked) view = 'connecting' // aún no sabemos si ya votaste: nunca se muestran las opciones activas antes
   else if (current.round.status === 'closed') view = 'closed'
   else if (countdown.expired) view = 'counting'
   else if (myOption) view = 'voted'

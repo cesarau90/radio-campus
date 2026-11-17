@@ -145,7 +145,7 @@ export default function AnnouncementsPanel({ announcements: an, nowMs }: Props) 
                           <button type="button" className="ad-btn ad-btn--sm" onClick={() => an.startEdit(a)} disabled={an.editingId !== null}>
                             Editar
                           </button>
-                          <button type="button" className="ad-btn ad-btn--sm" onClick={() => an.askDelete(a.id)}>
+                          <button type="button" className="ad-btn ad-btn--sm ad-btn--warn" onClick={() => an.askDelete(a.id)}>
                             Borrar
                           </button>
                         </span>

@@ -1,12 +1,12 @@
 # Estado del proyecto (para retomar)
 
-Última actualización: 2026-11-17. Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
+Última actualización: 2026-11-17 (Fase 9 en curso). Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
 
 ## Dónde vamos
 
-**Fase 5 (`/votar`): hecha, verificada en pantalla y desplegada.** Producción: **https://radio-campus-five.vercel.app** (repo público: https://github.com/cesarau90/radio-campus). Cada push a `main` se publica solo en Vercel (comprobado: el commit `d62d3db` quedó con el estado "Vercel · success" en GitHub, y el deploy nació 36 s después del push).
+**Fases 0 a 8 hechas, desplegadas y verificadas; la Fase 9 (pulido y documentación) está en curso.** Producción: **https://radio-campus-five.vercel.app** (repo público: https://github.com/cesarau90/radio-campus). Cada push a `main` se publica solo en Vercel (cada fase se comprobó con el estado "success" y los mismos archivos `index-*.js/css` que el build local).
 
-**Parado a propósito.** El rediseño de `/votar` está implementado y aprobado, **pero sin commit ni push** (todo está en el árbol de trabajo). No se empieza `/pantalla` hasta cerrar los pendientes del rediseño (ver "Pendientes del rediseño (próxima sesión)").
+**Lo que falta para cerrar:** commit de la Fase 9 (con el OK del usuario), la **ronda real con 2–3 celulares** y la limpieza de datos de prueba (ver "Antes de la demo").
 
 | Fase | Estado | Commit |
 |---|---|---|
@@ -15,23 +15,31 @@
 | 2 Lógica SQL | hecha, probada (53/53 en `round_logic.sql`) | `0460f1c` |
 | 3 Seed verificado | hecha | `cf60093` |
 | 4 Núcleo del cliente | hecha, probada | `28fde37` |
-| (extra) `.gitattributes` | hecho | `4745430` |
-| 5 `/votar` | hecha, verificada en pantalla | `08886ed` |
-| 5b deploy (GitHub + Vercel) | **hecho** (falta la prueba real con celulares) | `d62d3db` |
-| **Rediseño visual** | **implementado y aprobado en `/votar`, sin commit**; faltan 3 pendientes (panel de espera, mensaje del voto, capturas reales de urgente y cerrada); desbloquea la Fase 6 al cerrarse | |
-| 6 `/pantalla` | pendiente (bloqueada hasta cerrar el rediseño) | |
-| 7 `/admin` CRUDs | pendiente | |
-| 8 `/admin` operación | pendiente | |
-| 9 Pulido y documentación | pendiente | |
+| 5 `/votar` + deploy | hecha, verificada en pantalla, desplegada | `08886ed`, `d62d3db` |
+| Rediseño visual de `/votar` | hecho y desplegado | `e36a851` |
+| 6 `/pantalla` | hecha, verificada en vivo, desplegada | `47b89f9` |
+| 7 `/admin` CRUDs | hecha, verificada con sesión de admin, desplegada | `c18ee98` |
+| 8 `/admin` monitor, controles y simular contexto | hecha, criterio de contexto cumplido, desplegada | `58654f1` |
+| Voz (una sola ruta, dos idiomas) | hecha, desplegada | `f9ee56a` |
+| **9 Pulido y documentación** | **en curso**: bloque 1 (pulido) hecho; bloque 2 (README, arquitectura, manual, costos, índice de evidencias, criterios de aceptación) y bloque 3 (checklist) escritos; **sin commit** | |
 
-## Voz de la radio (2026-11-17): una sola ruta y dos idiomas
+## Fase 9 (pulido y documentación): en curso (2026-11-17)
 
-- **Una sola función:** `useSpeech.speak` es el único lugar que crea `SpeechSynthesisUtterance` (`/pantalla`, "Probar voz" del admin y el desbloqueo con el clic). Antes, si Edge aún no había cargado a Jorge en la primera frase, caía a la voz por defecto (posible voz de mujer): ahora, en la primera frase de la sesión, espera hasta 2,5 s a que aparezca una voz Natural, y el utterance de desbloqueo usa la misma voz elegida (silencioso).
-- **Dos idiomas:** `src/lib/speech.ts` (puro): `guessLang` (género latino/regional/reggaetón/banda/cumbia, o acentos/ñ → español; si no, inglés) y `nowPlayingSegments` / `newRoundSegments` / `roundResultSegments` parten el anuncio en tramos: lo fijo en español con Jorge (es-MX Natural → es-MX → es-US → es) y el título/artista en inglés con voz en-US masculina (Andrew → Guy → Brian → en-US Natural → en-US → en). Probado con listas de voces simuladas (todas las prioridades); el audio real solo se puede oír en Edge.
-- **Límite conocido de la heurística:** una canción en español sin acentos y en un género no latino (p. ej. "Despacito", pop) se dice con la voz en inglés.
+- **Bloque 1, pulido (hecho, verificado en vivo; capturas en `docs/evidencias/fase9/`):** "Borrar" con borde de peligro y confirmación ("Sí, borrar" / "No"); acciones de la tabla de canciones en un solo renglón; configuración en 2 columnas en escritorio; `/pantalla` sin hueco entre las opciones y el QR (el bloque se centra; en 1366×768 sigue sin scroll); `/votar` ya no parpadea al recargar con el voto emitido: muestra "Sintonizando…" hasta saber si ya votaste y la secuencia medida es Sintonizando → Voto registrado, sin pasar por las opciones activas.
+- **Bloque 2, documentación (escrita):** `README.md` (instalación, uso, limitaciones, créditos, mejoras futuras), `docs/arquitectura.md` (diagramas Mermaid de arquitectura, ronda, fases y base de datos), `docs/manual-admin.md` (sin contraseñas), `docs/servicios-y-costos.md`, `docs/evidencias/README.md` (índice) y la tabla de criterios de aceptación al inicio de `docs/pruebas.md`.
+- **Interfaz de YouTube oculta (2026-11-17, verificado en vivo, capturas `fase9/pantalla-*.png` y `pantalla-1920x1080-inicio-video.png`):** el iframe es 1,25 veces más grande que el recuadro y va centrado (token `--video-zoom`), así el recuadro recorta la barra del título; la **portada va encima** del video y se desvanece solo cuando el reproductor está en PLAYING (arranque, buffering, pausa y final la muestran de nuevo). YouTube dibuja un ícono de pausa al centro en los primeros segundos, así que el video se destapa **4 s después** de entrar en PLAYING (`REVEAL_MS`); medido: la portada se oculta a los ~3 s de cargar y el primer cuadro destapado sale limpio. Sin scroll en 1920×1080 y 1366×768.
+- **Bloque 3:** checklist "Antes de la demo" (más abajo).
+- **Pendiente tuyo:** limpiar los datos de prueba (rondas, historial, votos) y hacer la ronda real con celulares.
+
+## Voz de la radio (2026-11-17): una sola ruta, dos idiomas, voces de mujer
+
+- **Una sola función:** `useSpeech.speak` es el único lugar que crea `SpeechSynthesisUtterance` (`/pantalla`, "Probar voz" del admin y el desbloqueo con el clic). En la primera frase de la sesión, si todavía no hay una voz Natural en español, espera hasta 2,5 s a que Edge las cargue, y el utterance de desbloqueo usa la misma voz elegida (silencioso). Commit `f9ee56a`.
+- **La voz es Dalia (Edge)** — decisión del usuario (2026-11-17): voces de MUJER. Español: `Dalia` Natural → cualquier es-MX Natural de mujer → cualquier es-MX → es-US → cualquier es. Inglés (títulos y artistas): `Jenny`, `Aria` o `Ava` Natural (en ese orden) → cualquier en-US Natural de mujer → cualquier en-US → cualquier en. "De mujer" se decide descartando nombres masculinos conocidos (`MALE_NAME` en `src/lib/speech.ts`). Probado con listas de voces simuladas (todas las prioridades); el audio real solo se oye en Edge. Antes se había configurado Jorge/Andrew (voces de hombre) y el usuario lo cambió.
+- **Dos idiomas:** `src/lib/speech.ts` (puro): `guessLang` (género latino/pop latino/urbano/reggaetón/salsa/bachata/cumbia/banda/regional/norteño/mariachi/ranchera/corrido/bolero/trova, acentos o ñ, una palabra común en español —de, la, el, los, mi, tu, te, que, amor, corazón, cielito, volver…— o un diminutivo -ito/-ita → español; si no, inglés) y `nowPlayingSegments` / `newRoundSegments` / `roundResultSegments` parten el anuncio en tramos: lo fijo en español y el título/artista con la voz del idioma de la canción.
+- **Heurística sobre el seed (2026-11-17):** el acento o la ñ solo cuentan **en el título** (no en el artista: Michael Bublé, Frédéric Chopin), y se agregaron "feliz" y "navidad" a las palabras en español. "Despacito" estaba como `pop` (no `latino`); lo arregla el diminutivo -ito. Comprobado: "It's Beginning to Look a Lot Like Christmas" → **inglés**, "Feliz Navidad" → **español**, "Despacito" → español. De las 39 canciones, **26 quedan en inglés** y 13 en español: las 24 anteriores (Shape of You, Uptown Funk, Hymn for the Weekend, All of Me, Happy, Waka Waka, Bohemian Rhapsody, Smells Like Teen Spirit, Sweet Child O' Mine, Thunderstruck, Livin' on a Prayer, Wake Me Up, Levels, This Is What You Came For, One More Time, Faded, Canon in D, River Flows in You, Experience, Nuvole Bianche, All I Want for Christmas Is You, Last Christmas, Santa Tell Me, Rockin' Around the Christmas Tree) más "It's Beginning to Look a Lot Like Christmas" y "Nocturne Op. 9 No. 2" (su único acento estaba en el artista). Las clásicas francesas se dejaron como están: "Clair de Lune" (palabra "de") y "Gymnopédie No. 1" (acento en el título) en español.
 - **Debug:** `/pantalla?debug=1` tiene "Probar voz" y "Probar canción en inglés" ("Ahora suena Shape of You de Ed Sheeran"). En consola: `[voz] voces es-*`, `[voz] voces en-*` y `[voz] elegidas → es: … | en: …`.
 
-## Fase 8 (`/admin` monitor, controles y simular contexto): implementada y verificada, sin commit (2026-11-17)
+## Fase 8 (`/admin` monitor, controles y simular contexto): hecha y desplegada, commit `58654f1` (2026-11-17)
 
 - **Migración nueva (ya aplicada por el usuario en el SQL Editor):** `supabase/migrations/20261117000100_admin_preview_pick.sql`, función `admin_preview_pick(hora, temp, tipo de evento, tema)`: solo lectura, solo `is_admin()`, no crea rondas; devuelve contexto, cómo se eligió (reglas, tamaño del conjunto elegible, respaldo) y las 2 canciones. Quien monte la base desde cero debe correrla después de las otras 5 migraciones.
 - **Qué hay en `/admin`:** pestaña **Monitor** (`useAdminMonitor`, `MonitorPanel`): qué suena, ronda en vivo con votos A/B y cuenta regresiva, contexto con el que se creó la ronda (marca "simulado"), gráfica de votos de las últimas 10 rondas, últimas 15 reproducciones, y controles **pausar/reanudar**, **saltar canción** (`skip_requested_at`) y **cerrar la ronda ahora** (con confirmación). Pestaña **Simular contexto** (`useAdminSimulator`, `SimulatorPanel`): 6 escenarios de ejemplo, escenario propio (hora, temperatura, evento, tema), comparación de los últimos 6 escenarios, **Aplicar a la radio** (guarda `settings.context_override`) y **Quitar simulación**; aviso "Simulación activa" en ambas pestañas.
@@ -42,7 +50,7 @@
 - **Datos de prueba creados por esta verificación** (rondas, historial y `playback_state`; y los de la verificación en producción de `/pantalla`): se limpian por id antes de la ronda con celulares (SQL en la conversación). `settings.skip_requested_at` quedó con un valor de la prueba (inofensivo; el SQL lo limpia).
 - **Pendiente para la Fase 9:** el panel Monitor y los demás siguen sin versión de celular pulida; el `/admin` guarda la simulación sin pedir confirmación (avisa con banner).
 
-## Fase 7 (`/admin` CRUDs): implementada, sin commit (2026-11-17)
+## Fase 7 (`/admin` CRUDs): hecha y desplegada, commit `c18ee98` (2026-11-17)
 
 - **Commit pendiente:** Fase 6 está en `main` (`47b89f9`, desplegada; `/pantalla` carga en producción con la URL de Vercel en el QR). **Este ESTADO.md va junto con la Fase 7**, no por separado (decisión del usuario).
 - **Limpieza de datos de prueba de `/pantalla`: pendiente, se hace antes de la ronda con celulares.** Abrir `/pantalla` (también en producción) escribe en la base real (`rounds`, `play_history`, `playback_state`). Los ids de `play_history` solo los lee el admin; se limpia por rango de hora o con los ids que muestre un `select` previo.
@@ -78,7 +86,7 @@ Bloques: 1 núcleo (hecho, sin commit) · 2 YouTube (`useYouTubePlayer`, corte a
 - **Verificado en la base (2026-11-17):** la primera ronda creada con el clima guardó `context_snapshot.temp = 22` y `used_fallback = false` (las anteriores: `temp` null y `fallback_reason = sin_temperatura`). Criterio de aceptación del clima cumplido.
 - **Voz:** `pickVoice` elige es-MX "Natural" → es-MX → es-US → cualquier es, espera `voiceschanged` (tope 2 s), `rate 0.95`, `pitch 1.0` y registra en consola `[voz] …`. En el Chrome de pruebas eligió "Microsoft Helena (es-ES)" (no había es-MX ni es-US instalada). Ticker con desvanecido de 12 % en ambas orillas.
 - **Bloque 5 (cierre) hecho, sin commit:** aviso de conexión en `/pantalla` (`pt-banner`: "Reconectando…" / "Sin conexión. La radio sigue con lo que ya tiene y se reconecta sola."), probado con el evento `offline`/`online` (captura `pantalla-1920x1080-sin-conexion.png`). Recarga a media ronda: retoma la misma ronda y canción (probado varias veces). **Video en pausa en 2 capturas:** apareció la interfaz de YouTube con el video pausado en dos capturas (1366×768 y sin conexión) y no se pudo reproducir después (estados de YouTube 3 → 1 sin pausa, con captura, con `offline` y con cambio de tamaño); sigue sin causa confirmada. Existe el seguro que reanuda si se pausa solo. **Causa probable hallada después:** la captura `pantalla-1920x1080-resultado.png` muestra la pantalla final de YouTube (videos sugeridos) cuando el video termina unos segundos antes que el tiempo de la canción (`duration_sec` del seed puede pasarse de la duración real). Arreglo: si el video no está sonando (pausa o fin) se oculta y se ve la portada. Vigilar en la prueba real con TV.
-- **README (Fase 9):** "Funciones simuladas o limitaciones": primera canción al azar (la playlist de respaldo solo la lee el admin); la voz depende del navegador. Instrucciones: **"Para mejor voz, abrir /pantalla en Microsoft Edge"** (voces Natural es-MX como Dalia o Jorge). **Mejoras futuras: "TTS en la nube (ElevenLabs/Azure) vía Edge Function".**
+- **README (Fase 9):** "Funciones simuladas o limitaciones": primera canción al azar (la playlist de respaldo solo la lee el admin); la voz depende del navegador. Instrucciones: **"Para mejor voz, abrir /pantalla en Microsoft Edge"** (voces Natural es-MX como Dalia). **Mejoras futuras: "TTS en la nube (ElevenLabs/Azure) vía Edge Function".**
 
 ## Rediseño de `/votar` (2026-11-14): qué quedó y qué falta
 
@@ -169,13 +177,36 @@ Notas de la sesión: el servidor de desarrollo local (puerto 5199) quedó deteni
 
 ## Antes de la demo
 
-- **Aprobar el anuncio "Bienvenidos a Radio Campus"** desde `/admin` → Anuncios (hoy no sale al aire hasta que esté aprobado y activo).
-- **Poner "Máximo por canción" en 90** desde `/admin` → Configuración (hoy está en 0 = canción completa).
-- Limpiar los datos de prueba de `/pantalla` (`rounds`, `play_history`, `playback_state`) por id y subir el rate limit de sign-ins anónimos (ver abajo).
+Checklist. Lo marcado **(Supabase)** lo hace el usuario en el panel o el SQL Editor de Supabase; el resto, desde `/admin` o el equipo de la TV.
+
+**Supabase (a cargo del usuario)**
+
+- [ ] **Subir el límite de inicios de sesión anónimos por IP** (*Authentication → Rate Limits*; por defecto 30 por hora). Si el campus comparte IP, subirlo y **anotar el valor usado** en el README ("Funciones simuladas o limitaciones"). Si la opción no aparece, es `rate_limit_anonymous_users` en la Management API. Para ensayar con celulares, usar datos móviles en algunos para variar la IP.
+- [ ] **Site URL** (*Authentication → URL Configuration*): `https://radio-campus-five.vercel.app`.
+- [ ] **Despertar el proyecto**: un proyecto gratuito se pausa tras ~7 días sin actividad; abrirlo el día anterior y comprobar que `/votar` conecta.
+- [ ] **Limpiar los datos de prueba por id** (rondas, historial, `playback_state`, votos): ver el SQL de limpieza de la conversación del 2026-11-17. Datos conocidos al cierre de la Fase 9 (verificación del video): ronda `4e88f92b-3af0-4cf4-86d8-815be4b5b8d2` e historial `8bca12af-337f-4b70-86c9-00591c0c586c` (los votos caen en cascada con la ronda; si se vuelve a abrir `/pantalla`, aparecerán ids nuevos). Comprobar al final: `rounds` 0, `play_history` 0, `playback_state.phase = 'idle'`.
+- [ ] **Cuenta de administrador**: la de pruebas (`admin@radiocampus.test`) es de uso escolar; **cambiarle la contraseña o borrarla** después de la demo (*Authentication → Users*, y su fila en `admins`).
+- [ ] Confirmar `settings.context_override` en `null` y `paused = false` (`select context_override, paused from public.settings;`).
+
+**Desde `/admin`**
+
+- [ ] **Aprobar el anuncio "Bienvenidos a Radio Campus"** (Anuncios → Aprobar; nace sin aprobar).
+- [ ] **Poner "Máximo por canción" en 90** (Configuración) para que las rondas no duren minutos.
+- [ ] Revisar en **Monitor** que no diga *Simulación activa* ni *Radio en pausa*.
+- [ ] Opcional: crear un evento propio de la semana de la demo (Eventos y temas).
+
+**Equipo de la TV y celulares**
+
+- [ ] `npm run verify:seed` (39/39 videos) y `npm run smoke` (todo OK) el día anterior.
+- [ ] Abrir `/pantalla` en **Microsoft Edge**, pulsar **Activar sonido** y dejar **una sola** pantalla abierta (`/pantalla?debug=1` para probar la voz Dalia y la de inglés).
+- [ ] Comprobar que el **QR** apunta a `radio-campus-five.vercel.app/votar` (no a localhost) y que el recuadro mide 280 px o más.
+- [ ] **Ronda real con 2–3 celulares** en producción: votar, esperar el cierre, capturar la pantalla de cada celular y la ronda cerrada, y guardarlas en `docs/evidencias/ronda-real/`.
+- [ ] Mostrar el criterio de contexto: **Simular contexto** → escenarios → "Aplicar a la radio" → ver cambiar las opciones de la siguiente ronda → **Quitar simulación**.
+- [ ] Después de la demo: borrar los datos de prueba otra vez y quitar la simulación.
 
 ## Qué falta además
 
-- **Fase 9 — pulido de `/admin` (pedido por el usuario tras revisar las capturas de la Fase 7):**
+- **Fase 9, bloque 1 — pulido: HECHO (2026-11-17, sin commit)**; evidencias en `docs/evidencias/fase9/`. Lo pedido tras revisar las capturas de la Fase 7:
   - "Borrar" con estilo distinto (de peligro) y confirmación antes de borrar (hoy hay un "¿Sí, borrar?" en la fila; revisar que el botón de borrar ya se vea como acción destructiva desde el primer clic).
   - Acciones de la tabla de canciones en un solo renglón.
   - Configuración en 2 columnas en escritorio.

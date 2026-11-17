@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { loadYouTubeApi } from '../lib/youtubeApi'
-import { YT_ENDED, YT_PAUSED, YT_PLAYING, type YTPlayer } from '../types/youtube'
+import { YT_BUFFERING, YT_ENDED, YT_PAUSED, YT_PLAYING, YT_UNSTARTED, type YTPlayer } from '../types/youtube'
 
+const REVEAL_MS = 4000 // el video se destapa 4 s después de empezar a sonar: así no se ve el ícono de pausa que YouTube dibuja al arrancar
 const FADE_MS = 3000 // el volumen baja a 0 en los últimos 3 s de la canción
 const BLOCKED_AFTER_MS = 4000 // si no suena a los 4 s, el navegador bloqueó el audio automático
 const TICK_MS = 250
@@ -49,6 +50,7 @@ export function useYouTubePlayer({ videoId, startedAt, endsAt, nowMs, ready, pau
   const nowRef = useRef(nowMs)
   const endsAtRef = useRef(endsAt)
   const pausedRef = useRef(paused)
+  const revealRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
   const duckRef = useRef(duck)
   useEffect(() => {
     onErrorRef.current = onError
@@ -87,11 +89,15 @@ export function useYouTubePlayer({ videoId, startedAt, endsAt, nowMs, ready, pau
               if (!cancelled) setPlayer(e.target)
             },
             onStateChange: (e) => {
+              clearTimeout(revealRef.current)
               if (e.data === YT_PLAYING) {
                 hideCaptions(e.target) // si aun así salieron subtítulos, se quitan
-                setStatus('playing')
+                revealRef.current = setTimeout(() => setStatus('playing'), REVEAL_MS)
               } else if (e.data === YT_ENDED) {
                 setStatus('idle')
+              } else if (e.data === YT_BUFFERING || e.data === YT_UNSTARTED) {
+                // Arranque o carga: todavía no se ve el video, se queda la portada encima.
+                setStatus('loading')
               } else if (e.data === YT_PAUSED) {
                 // En pausa YouTube pinta su interfaz (título, "Más videos"): se oculta el video y se ve la portada.
                 setStatus('idle')
@@ -111,6 +117,7 @@ export function useYouTubePlayer({ videoId, startedAt, endsAt, nowMs, ready, pau
     )
     return () => {
       cancelled = true
+      clearTimeout(revealRef.current)
       setPlayer(null)
       created?.destroy()
       target.remove()

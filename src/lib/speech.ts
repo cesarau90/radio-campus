@@ -16,17 +16,46 @@ const isNatural = (v: SpeechSynthesisVoice) => /natural/i.test(v.name)
 
 // ---------- idioma de una canción ----------
 
-/** Géneros que se dicen en español (latino, regional, reggaetón, banda, cumbia…). */
-const SPANISH_GENRE = /latin|regional|reggaet|banda|cumbia|norte[ñn]|mariachi|bolero|ranchera|salsa|bachata|corrido|mexican/i
+/** Géneros que se dicen en español (latino y pop latino, urbano, reggaetón, salsa, bachata, cumbia, banda, regional, norteño, mariachi…). */
+const SPANISH_GENRE =
+  /latin|urbano|reggaet|salsa|bachata|cumbia|banda|regional|norte[ñn]o|mariachi|ranchera|corrido|bolero|trova|mexican/i
 const SPANISH_CHARS = /[áéíóúñüÁÉÍÓÚÑÜ¿¡]/
 
 /**
- * Heurística simple: género latino/regional → español; título o artista con acentos o ñ → español;
- * en cualquier otro caso → inglés. No es perfecta (p. ej. "Despacito" no tiene acentos y está en pop).
+ * Palabras comunes en español (sin acentos y en minúsculas). Se buscan como palabra completa en el título y el artista.
+ * Se evitaron las que también son palabras comunes en inglés ("no", "me", "sin", "solo"…) para no leer en español un título en inglés.
+ */
+const SPANISH_WORDS = new Set([
+  'de', 'del', 'la', 'las', 'el', 'los', 'un', 'una', 'mi', 'tu', 'te', 'que', 'por', 'para', 'con',
+  'amor', 'corazon', 'cielito', 'lindo', 'noche', 'vida', 'volver', 'bailando', 'feliz', 'navidad', 'beso', 'besos',
+  'quiero', 'siempre', 'nunca', 'cuando', 'donde', 'mundo', 'cielo', 'fiesta', 'vamos', 'baila',
+])
+
+/** Quita acentos y pasa a minúsculas, y separa en palabras. */
+function words(text: string): string[] {
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .split(/[^a-z]+/)
+    .filter(Boolean)
+}
+
+/** ¿El texto trae alguna palabra común en español o un diminutivo (-ito/-ita, como "Despacito")? */
+function hasSpanishWord(text: string): boolean {
+  return words(text).some((w) => SPANISH_WORDS.has(w) || (w.length >= 7 && /(ito|ita)$/.test(w)))
+}
+
+/**
+ * Heurística simple, en este orden: género latino o regional → español; **título** con acentos o ñ → español
+ * (el acento solo en el nombre del artista no cuenta: Michael Bublé, Frédéric Chopin);
+ * título o artista con una palabra común en español (de, la, amor, corazón, volver…) o un diminutivo → español;
+ * en cualquier otro caso → inglés. No es perfecta: es una regla, no un detector de idioma.
  */
 export function guessLang(song: { title: string; artist: string; genre?: string }): Lang {
   if (song.genre && SPANISH_GENRE.test(song.genre)) return 'es'
-  if (SPANISH_CHARS.test(`${song.title} ${song.artist}`)) return 'es'
+  if (SPANISH_CHARS.test(song.title)) return 'es'
+  if (hasSpanishWord(`${song.title} ${song.artist}`)) return 'es'
   return 'en'
 }
 
@@ -82,26 +111,37 @@ export function roundResultSegments(winner: SongLike, tie: boolean): Segment[] {
 
 // ---------- elección de voz ----------
 
-/** Español: "Jorge" Natural → es-MX Natural → es-MX → es-US → cualquier español. */
+/** Nombres de voces masculinas conocidas (Edge y Windows): sirven para quedarse con las de mujer cuando no hay una preferida. */
+const MALE_NAME =
+  /\b(jorge|alvaro|alonso|raul|pablo|diego|manuel|ricardo|carlos|andrew|brian|guy|christopher|eric|roger|steffan|ryan|davis|tony|jason|david|mark|james|george|daniel|jacob|aaron)/i
+const isFemale = (v: SpeechSynthesisVoice) => !MALE_NAME.test(v.name)
+/** La voz de mujer si hay alguna; si no, la primera. */
+const preferFemale = (list: SpeechSynthesisVoice[]) => list.find(isFemale) ?? list[0]
+
+/** Español (voz de mujer): "Dalia" Natural → es-MX Natural de mujer → es-MX → es-US → cualquier español. */
 export function pickSpanishVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
   const mx = voices.filter((v) => norm(v.lang) === 'es-mx')
   return (
-    voices.find((v) => /jorge/i.test(v.name) && isNatural(v)) ??
-    mx.find(isNatural) ??
-    mx[0] ??
-    voices.find((v) => norm(v.lang) === 'es-us') ??
-    voices.find((v) => norm(v.lang).startsWith('es'))
+    mx.find((v) => /dalia/i.test(v.name) && isNatural(v)) ??
+    mx.find((v) => isNatural(v) && isFemale(v)) ??
+    preferFemale(mx) ??
+    preferFemale(voices.filter((v) => norm(v.lang) === 'es-us')) ??
+    preferFemale(voices.filter((v) => norm(v.lang).startsWith('es')))
   )
 }
 
-/** Inglés masculino: Andrew → Guy → Brian (en-US, mejor si es Natural) → en-US Natural → en-US → cualquier inglés. */
+/** Inglés (voz de mujer): Jenny → Aria → Ava (en-US, Natural) → en-US Natural de mujer → en-US → cualquier inglés. */
 export function pickEnglishVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
   const us = voices.filter((v) => norm(v.lang) === 'en-us')
-  for (const name of [/andrew/i, /guy/i, /brian/i]) {
-    const found = us.find((v) => name.test(v.name) && isNatural(v)) ?? us.find((v) => name.test(v.name))
+  for (const name of [/jenny/i, /aria/i, /\bava/i]) {
+    const found = us.find((v) => name.test(v.name) && isNatural(v))
     if (found) return found
   }
-  return us.find(isNatural) ?? us[0] ?? voices.find((v) => norm(v.lang).startsWith('en'))
+  return (
+    us.find((v) => isNatural(v) && isFemale(v)) ??
+    preferFemale(us) ??
+    preferFemale(voices.filter((v) => norm(v.lang).startsWith('en')))
+  )
 }
 
 export function pickVoiceFor(lang: Lang, voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {

@@ -180,7 +180,7 @@ export default function SongsPanel({ songs: s }: { songs: AdminSongsModel }) {
                   </td>
                   <td>
                     {s.deleteId === song.id ? (
-                      <span className="ad-row-actions" role="group" aria-label={`Borrar ${song.title}`}>
+                      <span className="ad-row-actions ad-row-actions--line" role="group" aria-label={`Borrar ${song.title}`}>
                         <button type="button" className="ad-btn ad-btn--danger ad-btn--sm" onClick={() => void s.confirmDelete()}>
                           Sí, borrar
                         </button>
@@ -189,14 +189,14 @@ export default function SongsPanel({ songs: s }: { songs: AdminSongsModel }) {
                         </button>
                       </span>
                     ) : (
-                      <span className="ad-row-actions">
+                      <span className="ad-row-actions ad-row-actions--line">
                         <button type="button" className="ad-btn ad-btn--sm" onClick={() => s.startEdit(song)} disabled={s.editingId !== null}>
                           Editar
                         </button>
                         <button type="button" className="ad-btn ad-btn--sm" onClick={() => void s.toggleActive(song)}>
                           {song.active ? 'Desactivar' : 'Activar'}
                         </button>
-                        <button type="button" className="ad-btn ad-btn--sm" onClick={() => s.askDelete(song.id)}>
+                        <button type="button" className="ad-btn ad-btn--sm ad-btn--warn" onClick={() => s.askDelete(song.id)}>
                           Borrar
                         </button>
                       </span>

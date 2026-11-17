@@ -551,3 +551,32 @@
     transition: none;
   }
 }
+
+/* ---------- pulido de /admin (Fase 9) ---------- */
+/* "Borrar": borde de peligro desde el primer vistazo; la confirmación ("Sí, borrar") ya va rellena de rojo. */
+.ad-btn--warn {
+  border-color: var(--color-alert);
+  border-width: var(--border-strong);
+}
+/* Acciones de la tabla de canciones en un solo renglón: la columna se ajusta a su contenido. */
+.ad-row-actions--line {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+.ad-table td:has(> .ad-row-actions--line) {
+  width: 1%;
+}
+/* Configuración: dos columnas en escritorio. */
+.ad-section--form {
+  max-width: 64rem;
+}
+.ad-form-grid {
+  display: grid;
+  gap: var(--space-5);
+}
+@media (min-width: 900px) {
+  .ad-form-grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+}

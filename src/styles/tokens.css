@@ -86,6 +86,7 @@
   --cover-lg: 5.5rem;
   --admin-max: 72rem; /* ancho del panel /admin */
   --cover-xl: min(26rem, 52vh); /* portada de "Sonando ahora" en /pantalla */
+  --video-zoom: 1.25; /* el iframe de YouTube se agranda y se recorta para esconder su barra de título */
   --qr-size: 17.5rem; /* QR de /pantalla: 280 px mínimo, sobre papel claro con margen (quiet zone) */
   --qr-pad: 1.25rem;
   --tap-min: 3.5rem;

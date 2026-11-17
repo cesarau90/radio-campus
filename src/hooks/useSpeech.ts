@@ -70,7 +70,7 @@ async function ensureVoices(): Promise<void> {
  * Voz de la radio con speechSynthesis (gratis, sin servidor). ÚNICO lugar donde se crean `SpeechSynthesisUtterance`:
  * /pantalla y el "Probar voz" del admin pasan por `speak`, así que siempre se elige la voz igual.
  * `speak` acepta un texto en español o una lista de tramos con idioma ({ text, lang }): cada tramo se dice con la voz
- * de su idioma (Jorge para español; Andrew, Guy o Brian para inglés) y todos se encolan sin encimarse.
+ * de su idioma (voces de mujer: Dalia para español; Jenny, Aria o Ava para inglés) y todos se encolan sin encimarse.
  * Devuelve una promesa que se cumple cuando termina el último tramo (o falla, o se agota el tope): nadie se queda colgado.
  * `speaking` sirve para bajar el volumen de la música. Chrome exige una interacción previa con la página: si bloquea la voz,
  * `blocked` pasa a true y `unlock` (desde un clic) la activa. Sin soporte de voz, solo se espera lo que tardaría en leerse.

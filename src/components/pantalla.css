@@ -86,14 +86,22 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: max(100cqw, 100cqh * 16 / 9);
-  height: max(100cqh, 100cqw * 9 / 16);
+  /* El iframe es más grande que el recuadro (--video-zoom) y va centrado: el recuadro recorta la barra del título
+     de YouTube y los bordes. */
+  width: calc(max(100cqw, 100cqh * 16 / 9) * var(--video-zoom));
+  height: calc(max(100cqh, 100cqw * 9 / 16) * var(--video-zoom));
   transform: translate(-50%, -50%);
-  opacity: 0;
   pointer-events: none;
 }
-.pt-player.is-live {
-  opacity: 1;
+/* La portada (o el dial) tapa el video hasta que suena; el fundido evita saltos. */
+.pt-cover-fade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-ui) var(--ease-out);
+}
+.pt-cover-fade.is-hidden {
+  opacity: 0;
 }
 .pt-player iframe {
   display: block;
@@ -183,6 +191,7 @@
 .pt-side {
   display: flex;
   flex-direction: column;
+  justify-content: center; /* el bloque (título, cuenta, opciones y QR) queda centrado: sin hueco entre opciones y QR */
   gap: var(--space-4);
   padding: var(--space-8);
 }
@@ -331,7 +340,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-6);
-  margin: auto 0 0;
+  margin: var(--space-4) 0 0;
 }
 .pt-qr-paper {
   flex: none;
@@ -466,6 +475,7 @@
   .pt-qr {
     --qr-pad: var(--space-2);
     gap: var(--space-4);
+    margin-top: 0; /* en pantallas bajas no sobra altura para separarlo más */
   }
   .pt-qr-title {
     font-size: var(--step-1);
@@ -598,4 +608,10 @@
   font: inherit;
   font-weight: var(--weight-bold);
   cursor: pointer;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pt-cover-fade {
+    transition: none;
+  }
 }

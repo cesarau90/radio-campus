@@ -39,8 +39,8 @@ function Option({ tag, song, votes, percent, isWinner }: { tag: 'A' | 'B'; song:
 }
 
 /** Hueco donde YouTube monta su iframe. `attach` recibe el elemento una sola vez (es un setState estable). */
-function PlayerSlot({ attach, live }: { attach: (el: HTMLElement | null) => void; live: boolean }) {
-  return <span className={`pt-player${live ? ' is-live' : ''}`} ref={attach} />
+function PlayerSlot({ attach }: { attach: (el: HTMLElement | null) => void }) {
+  return <span className="pt-player" ref={attach} />
 }
 
 /** Pantalla completa de /pantalla (TV del campus). Solo pinta el modelo que arma usePantalla; no tiene lógica propia. */
@@ -76,14 +76,18 @@ export default function PantallaView(m: PantallaModel) {
           <section className="pt-now" aria-label="Sonando ahora">
             {/* El reproductor vive siempre dentro de este recuadro; con el video sonando tapa la portada. */}
             <span className="pt-now-cover">
-              {m.nowSong ? (
-                <Cover song={m.nowSong} />
-              ) : (
-                <span className="pt-dial pt-dial--fill" aria-hidden="true">
-                  <DialMark size={64} className="vt-scan" />
-                </span>
-              )}
-              <PlayerSlot attach={m.attachPlayer} live={m.playerPlaying} />
+              <PlayerSlot attach={m.attachPlayer} />
+              {/* La portada va ENCIMA del video y se desvanece solo cuando el reproductor está sonando: en el arranque,
+                  al cargar, en pausa y al terminar se ve la portada, nunca la interfaz de YouTube. */}
+              <span className={`pt-cover-fade${m.playerPlaying ? ' is-hidden' : ''}`}>
+                {m.nowSong ? (
+                  <Cover song={m.nowSong} />
+                ) : (
+                  <span className="pt-dial pt-dial--fill" aria-hidden="true">
+                    <DialMark size={64} className="vt-scan" />
+                  </span>
+                )}
+              </span>
               {m.soundBlocked && (
                 <button type="button" className="pt-unlock" onClick={m.unlockSound}>
                   Activar sonido

@@ -58,7 +58,7 @@ export default function SettingsForm({ settings: s }: { settings: AdminSettingsM
   const invalid = Object.keys(s.errors).length > 0
   return (
     <form
-      className="ad-section"
+      className="ad-section ad-section--form"
       onSubmit={(e) => {
         e.preventDefault()
         void s.save()
@@ -66,6 +66,7 @@ export default function SettingsForm({ settings: s }: { settings: AdminSettingsM
     >
       <h2 className="ad-h2">Configuración de la radio</h2>
 
+      <div className="ad-form-grid">
       <fieldset className="ad-group">
         <legend className="ad-legend">Rondas y reproducción</legend>
         <NumberField s={s} field="round_duration_sec" label="Duración mínima de la ronda (segundos)" hint="La ronda dura lo que suena la canción menos 10 s, y nunca menos que esto." />
@@ -117,6 +118,7 @@ export default function SettingsForm({ settings: s }: { settings: AdminSettingsM
           </span>
         </label>
       </fieldset>
+      </div>
 
       {s.error && (
         <p className="ad-error" role="alert">

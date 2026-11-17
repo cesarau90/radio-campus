@@ -1,7 +1,24 @@
 # Pruebas y criterios de aceptación
 
-> Este documento se completa en la Fase 9 con el checklist de aceptación y espacio para capturas.
-> Mientras tanto, aquí queda la evidencia de las pruebas automáticas de base de datos.
+> Qué se probó y cómo. Primero el checklist de aceptación (con su evidencia); después el detalle de las pruebas de base de datos y del cliente. Las capturas están indexadas en [evidencias/README.md](evidencias/README.md).
+
+## Criterios de aceptación
+
+| # | Criterio | Estado | Evidencia |
+|---|---|---|---|
+| 1 | Un visitante puede votar **una sola vez** por ronda, también si recarga o abre dos pestañas | Cumplido | Pruebas SQL C1–C8 (`round_logic.sql`); [`fase5/`](evidencias/fase5/) (`ya-votaste`); [`fase9/votar-recarga-con-voto-390x844.png`](evidencias/fase9/votar-recarga-con-voto-390x844.png) |
+| 2 | El servidor decide los tiempos: un voto tardío o con el reloj del celular desfasado se rechaza | Cumplido | Pruebas SQL B1–B3 y C8 (53/53 sin fallos) |
+| 3 | La ronda se **cierra sola** al vencer y gana por votos (con reglas de empate y de "sin votos") | Cumplido | Pruebas SQL D1–D9 (incluye `pg_cron`); [`fase5/rediseno/votar-390x844-cerrada-real.png`](evidencias/fase5/rediseno/votar-390x844-cerrada-real.png) |
+| 4 | **Un cambio de contexto cambia las 2 opciones** de la siguiente ronda (hora, temperatura y evento) | Cumplido | [`fase8/simular-comparacion-completa-1366.png`](evidencias/fase8/simular-comparacion-completa-1366.png) (6 escenarios) y rondas reales con simulación: [`fase8/monitor-ronda1-examenes-completo.png`](evidencias/fase8/monitor-ronda1-examenes-completo.png) → [`fase8/monitor-ronda2-calor-completo.png`](evidencias/fase8/monitor-ronda2-calor-completo.png) |
+| 5 | La temperatura real llega al algoritmo (Open-Meteo) y sin clima se usa la playlist de respaldo | Cumplido | Ronda con `context_snapshot.temp = 22` y `used_fallback = false` (ESTADO.md); escenario "Sin dato de clima" en [`fase8/`](evidencias/fase8/) |
+| 6 | `/pantalla` reproduce la canción, abre la ronda, muestra el QR y los votos en vivo, anuncia la ganadora y la reproduce | Cumplido | [`fase6/`](evidencias/fase6/) (`bloque2c`, `resultado`) |
+| 7 | La pantalla **retoma** a media ronda al recargar y avisa si pierde la conexión | Cumplido | ESTADO.md (Fase 6); [`fase6/pantalla-1920x1080-sin-conexion.png`](evidencias/fase6/pantalla-1920x1080-sin-conexion.png) |
+| 8 | Un video que falla se registra y se salta; el anuncio no se encima con la canción | Cumplido en código y probado en parte | El salto del admin queda como "Saltada" en el historial ([`fase8/monitor-ronda2-calor-completo.png`](evidencias/fase8/monitor-ronda2-calor-completo.png)); el error de un video real no se provocó |
+| 9 | El admin puede gestionar canciones, eventos, anuncios y configuración, y **la configuración persiste** | Cumplido | [`fase7/`](evidencias/fase7/) (antes / guardado / recargado) |
+| 10 | Solo un administrador puede escribir; los anónimos no | Cumplido | `rls_write_access.sql`: 0 fallos en 5 actores (más abajo) |
+| 11 | Aceptable en celular (390 y 320 px), con contraste ≥ 4,5:1 y foco visible con teclado | Cumplido | [`fase5/`](evidencias/fase5/) (`contraste`, `foco-teclado`) |
+| 12 | Funciona en **producción** (Vercel) | Cumplido | `/votar`, `/pantalla` y `/admin` responden en https://radio-campus-five.vercel.app; [`fase5/rediseno/produccion-390x844-espera.png`](evidencias/fase5/rediseno/produccion-390x844-espera.png) |
+| 13 | **Ronda real con 2–3 celulares** en producción | **Pendiente** | Se hace antes de la demo (ver ESTADO.md → Antes de la demo) |
 
 ## Pruebas de base de datos
 

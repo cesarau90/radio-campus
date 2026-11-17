@@ -122,7 +122,7 @@ export default function EventsPanel({ events: ev, themes, nowMs }: Props) {
                           <button type="button" className="ad-btn ad-btn--sm" onClick={() => ev.startEdit(row)} disabled={ev.editingId !== null}>
                             Editar
                           </button>
-                          <button type="button" className="ad-btn ad-btn--sm" onClick={() => ev.askDelete(row.id)}>
+                          <button type="button" className="ad-btn ad-btn--sm ad-btn--warn" onClick={() => ev.askDelete(row.id)}>
                             Borrar
                           </button>
                         </span>
