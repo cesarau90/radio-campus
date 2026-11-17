@@ -90,6 +90,20 @@ Sirve para **demostrar y comprobar** que la radio cambia sus opciones según el 
 
 Guarda con **Guardar cambios**; los valores no válidos se marcan antes de enviar. `/pantalla` toma los cambios en la siguiente ronda.
 
+## 7b. Respaldo y restablecer el servicio
+
+**Reglas** y **Playlists** tienen su propia pestaña. En **Configuración → Respaldo**:
+
+- **Exportar respaldo** descarga un JSON con los ajustes, las reglas, los eventos, los anuncios y las playlists (las canciones van por su ID de YouTube). No incluye el catálogo de canciones ni el historial de votos.
+- **Importar respaldo** pide confirmación y **no borra nada**: lo que ya existe con el mismo nombre o texto se sobrescribe y lo que falta se crea. Importar el mismo archivo dos veces no duplica nada.
+
+Para restablecer el servicio:
+
+1. Si el proyecto de Supabase se pausó (plan gratuito, ~7 días sin actividad), reactívalo desde su panel.
+2. Recarga `/pantalla` (y pulsa **Activar sonido**).
+3. Si la base está vacía o se recreó: aplica las migraciones en orden y el seed (ver el README), crea el admin y luego **importa el respaldo** más reciente.
+4. Revisa en **Monitor** que no diga *Simulación activa* ni *Radio en pausa*.
+
 ## 8. Antes de la demo (resumen)
 
 1. Aprobar el anuncio *"Bienvenidos a Radio Campus"* (Anuncios).

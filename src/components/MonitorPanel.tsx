@@ -132,6 +132,28 @@ export default function MonitorPanel({ monitor: m }: { monitor: AdminMonitorMode
         </div>
       </div>
 
+      {m.next && (
+        <div className="ad-group">
+          <h3 className="ad-legend">Siguiente</h3>
+          {m.next.song ? (
+            <div className="ad-sim-song">
+              <span className="ad-song-cover ad-song-cover--lg">
+                <Cover song={m.next.song} />
+              </span>
+              <span className="ad-song-text">
+                <strong>{m.next.song.title}</strong>
+                <span className="ad-hint">{m.next.song.artist}</span>
+                <span className="ad-hint mono">{m.next.label}</span>
+              </span>
+            </div>
+          ) : (
+            <p className="ad-hint">
+              <strong>{m.next.label}.</strong> Aún no hay una ganadora clara.
+            </p>
+          )}
+        </div>
+      )}
+
       <div className="ad-group">
         <h3 className="ad-legend">{m.roundOpen ? 'Ronda abierta' : m.round ? 'Última ronda (cerrada)' : 'Ronda'}</h3>
         {m.round ? (
@@ -158,6 +180,47 @@ export default function MonitorPanel({ monitor: m }: { monitor: AdminMonitorMode
           <p className="ad-hint">Todavía no hay rondas.</p>
         )}
       </div>
+
+      {m.stats && (
+        <div className="ad-group">
+          <h3 className="ad-legend">Estadísticas de participación</h3>
+          <ul className="ad-stats" aria-label="Estadísticas">
+            <li>
+              <strong className="mono">{m.stats.rounds}</strong>
+              <span className="ad-hint">Rondas</span>
+            </li>
+            <li>
+              <strong className="mono">{m.stats.votes}</strong>
+              <span className="ad-hint">Votos</span>
+            </li>
+            <li>
+              <strong className="mono">{m.stats.avgVotes}</strong>
+              <span className="ad-hint">Promedio por ronda</span>
+            </li>
+            <li>
+              <strong className="mono">{m.stats.noVotes}</strong>
+              <span className="ad-hint">Rondas sin votos</span>
+            </li>
+            <li>
+              <strong className="mono">{m.stats.ties}</strong>
+              <span className="ad-hint">Empates</span>
+            </li>
+          </ul>
+          <h4 className="ad-subtitle">Top 5 canciones más votadas</h4>
+          {m.stats.top.length === 0 ? (
+            <p className="ad-hint">Aún no hay votos.</p>
+          ) : (
+            <ol className="ad-top">
+              {m.stats.top.map((t) => (
+                <li key={t.songId}>
+                  <span>{m.titleOf(t.songId)}</span>
+                  <span className="mono ad-hint">{t.votes} votos</span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      )}
 
       <div className="ad-cols">
         <div className="ad-group">

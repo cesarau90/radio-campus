@@ -83,6 +83,7 @@
   --cover-min: 8.5rem; /* alto mínimo de la portada de tarjeta en celular */
   --card-max: 21rem; /* alto máximo de cada tarjeta en celular, para que no se estiren de más */
   --check-size: 1.75rem; /* círculo de selección */
+  --check-tap: 2.75rem; /* casilla táctil del admin en tableta (44 px) */
   --cover-lg: 5.5rem;
   --admin-max: 72rem; /* ancho del panel /admin */
   --cover-xl: min(26rem, 52vh); /* portada de "Sonando ahora" en /pantalla */

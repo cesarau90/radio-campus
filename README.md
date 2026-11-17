@@ -103,7 +103,6 @@ React 19 · Vite · TypeScript · React Router · Supabase (Postgres, Auth, Real
 ## Mejoras futuras
 
 - **TTS en la nube (ElevenLabs / Azure) vía Edge Function**, para que la voz sea la misma en cualquier navegador.
-- Editor de **reglas contextuales** y de **playlists** en `/admin` (hoy las reglas se editan en la base).
 - Una columna de **idioma** por canción para decir los títulos con la voz correcta, en lugar de la heurística.
 - Abrir la **playlist de respaldo** a lectura pública (o una función segura) para arrancar la radio con ella.
 - Pruebas automáticas de extremo a extremo (Playwright) en CI.

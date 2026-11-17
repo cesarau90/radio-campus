@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { adminForceCloseRound, fetchPlayHistory, fetchRecentClosedRounds, fetchSongsByIds, updateSettings } from '../lib/api'
+import { adminForceCloseRound, fetchPlayHistory, fetchRecentClosedRounds, fetchRoundStatsRows, fetchSongsByIds, updateSettings } from '../lib/api'
+import { computeStats, type RoundStats } from '../lib/stats'
 import { formatClock } from '../lib/time'
 import { percentages } from '../lib/votes'
 import { useCountdown } from './useCountdown'
@@ -10,6 +11,13 @@ import type { PlayHistoryRow, Round, Song } from '../types'
 const HISTORY_ROWS = 15
 const CHART_ROUNDS = 10
 const REFRESH_MS = 30_000
+
+/** Tarjeta "Siguiente": quién sigue en la radio según la ronda. */
+export interface NextCard {
+  kind: 'leading' | 'tie' | 'pending' | 'winner'
+  label: string
+  song: Song | null
+}
 
 export interface ChartRow {
   id: string
@@ -37,6 +45,7 @@ export function useAdminMonitor(enabled: boolean) {
 
   const [history, setHistory] = useState<PlayHistoryRow[]>([])
   const [closed, setClosed] = useState<Round[]>([])
+  const [stats, setStats] = useState<RoundStats | null>(null)
   const [extraSongs, setExtraSongs] = useState<Record<string, Song>>({})
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -49,8 +58,13 @@ export function useAdminMonitor(enabled: boolean) {
 
   const refreshLists = useCallback(async () => {
     try {
-      const [h, r] = await Promise.all([fetchPlayHistory(HISTORY_ROWS), fetchRecentClosedRounds(CHART_ROUNDS)])
-      const needed = new Set<string>([...h.map((x) => x.song_id), ...r.flatMap((x) => [x.option_a, x.option_b, ...(x.winner_id ? [x.winner_id] : [])])])
+      const [h, r, rows] = await Promise.all([fetchPlayHistory(HISTORY_ROWS), fetchRecentClosedRounds(CHART_ROUNDS), fetchRoundStatsRows()])
+      const st = computeStats(rows)
+      const needed = new Set<string>([
+        ...h.map((x) => x.song_id),
+        ...r.flatMap((x) => [x.option_a, x.option_b, ...(x.winner_id ? [x.winner_id] : [])]),
+        ...st.top.map((x) => x.songId),
+      ])
       const missing = [...needed].filter((id) => !extraSongs[id])
       if (missing.length > 0) {
         const rows = await fetchSongsByIds(missing)
@@ -58,6 +72,7 @@ export function useAdminMonitor(enabled: boolean) {
       }
       setHistory(h)
       setClosed(r)
+      setStats(st)
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     }
@@ -120,6 +135,21 @@ export function useAdminMonitor(enabled: boolean) {
   const sinceSec =
     playback?.started_at && clock.ready ? Math.max(0, Math.floor((clock.nowMs() - new Date(playback.started_at).getTime()) / 1000)) : null
 
+  const optionA = round ? (songs[round.option_a] ?? null) : null
+  const optionB = round ? (songs[round.option_b] ?? null) : null
+  const next: NextCard | null = (() => {
+    if (!round) return null
+    if (round.status === 'open') {
+      if (round.votes_a === 0 && round.votes_b === 0) return { kind: 'pending', label: 'Se decide por voto', song: null }
+      if (round.votes_a === round.votes_b) return { kind: 'tie', label: 'Empate parcial: se decide por voto', song: null }
+      return round.votes_a > round.votes_b
+        ? { kind: 'leading', label: 'Va ganando (la ronda sigue abierta)', song: optionA }
+        : { kind: 'leading', label: 'Va ganando (la ronda sigue abierta)', song: optionB }
+    }
+    const w = round.winner_id ? (songs[round.winner_id] ?? extraSongs[round.winner_id] ?? null) : null
+    return w ? { kind: 'winner', label: 'Ganadora de la última ronda', song: w } : { kind: 'pending', label: 'Se decide por voto', song: null }
+  })()
+
   const chart: ChartRow[] = closed
     .map((r) => {
       const p = percentages(r.votes_a, r.votes_b)
@@ -147,8 +177,11 @@ export function useAdminMonitor(enabled: boolean) {
     phase: playback?.phase ?? 'idle',
     sinceLabel: sinceSec === null ? null : formatClock(sinceSec),
     round,
-    optionA: round ? (songs[round.option_a] ?? null) : null,
-    optionB: round ? (songs[round.option_b] ?? null) : null,
+    optionA,
+    optionB,
+    next,
+    stats,
+    titleOf,
     roundOpen,
     timeLabel: countdown.remainingSec === null ? null : formatClock(countdown.remainingSec),
     percentA: pct.a,
