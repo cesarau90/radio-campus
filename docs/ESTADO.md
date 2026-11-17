@@ -1,12 +1,12 @@
 # Estado del proyecto (para retomar)
 
-Última actualización: 2026-11-17 (Fase 9 en curso). Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
+Última actualización: 2026-11-17, al cierre del día (Fase 10 empezada y en pausa). Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
 
 ## Dónde vamos
 
-**Fases 0 a 8 hechas, desplegadas y verificadas; la Fase 9 (pulido y documentación) está en curso.** Producción: **https://radio-campus-five.vercel.app** (repo público: https://github.com/cesarau90/radio-campus). Cada push a `main` se publica solo en Vercel (cada fase se comprobó con el estado "success" y los mismos archivos `index-*.js/css` que el build local).
+**Fases 0 a 9 hechas, desplegadas y verificadas. La Fase 10 ("requisitos faltantes" que salieron de la auditoría) está empezada y EN PAUSA: hay código sin commit y sin probar** (ver "Fase 10" más abajo). Producción: **https://radio-campus-five.vercel.app** (repo público: https://github.com/cesarau90/radio-campus). Cada push a `main` se publica solo en Vercel (cada commit se comprobó con el estado "success" y los mismos archivos `index-*.js/css` que el build local).
 
-**Lo que falta para cerrar:** la limpieza de los datos de prueba (ver "Antes de la demo"). La ronda real en producción con PC e iPhone ya se hizo (2026-11-17; evidencias en `docs/evidencias/demo/`).
+**Lo que falta para cerrar el proyecto:** terminar la Fase 10 (reglas, playlists, respaldo, tableta, estadísticas, tarjeta "Siguiente"), y antes de la demo la limpieza de datos de prueba (ver "Antes de la demo"). La ronda real en producción con PC e iPhone ya se hizo (evidencias en `docs/evidencias/demo/`).
 
 | Fase | Estado | Commit |
 |---|---|---|
@@ -21,7 +21,64 @@
 | 7 `/admin` CRUDs | hecha, verificada con sesión de admin, desplegada | `c18ee98` |
 | 8 `/admin` monitor, controles y simular contexto | hecha, criterio de contexto cumplido, desplegada | `58654f1` |
 | Voz (una sola ruta, dos idiomas) | hecha, desplegada | `f9ee56a` |
-| **9 Pulido y documentación** | **en curso**: bloque 1 (pulido) hecho; bloque 2 (README, arquitectura, manual, costos, índice de evidencias, criterios de aceptación) y bloque 3 (checklist) escritos; **sin commit** | |
+| 9 Pulido y documentación (+ voces de mujer y heurística de idioma) | hecha, desplegada | `b3f9d98` |
+| Arreglo del voto en Safari (`cast_vote` 401) | hecho, desplegado, verificado en un iPhone real | `6e75d06` |
+| Evidencias de la ronda real + portada durante anuncios | hecho, desplegado | `e757429` |
+| **10 Requisitos faltantes** | **en pausa**: código parcial sin commit (ver abajo) | — |
+
+## Lo hecho hoy (2026-11-17)
+
+- **Fase 6** (`/pantalla`: director, YouTube, voz, clima, ticker, QR, conexión), **Fase 7** (CRUDs del admin, verificados con sesión real), **Fase 8** (monitor, controles y simulador de contexto; migración `20261117000100_admin_preview_pick.sql`, ya aplicada) y **Fase 9** (pulido, README, arquitectura con 4 diagramas Mermaid, manual de admin, costos, índice de evidencias, criterios de aceptación), todas desplegadas.
+- **Voz:** una sola ruta (`useSpeech`), dos idiomas con heurística (`guessLang`), voces de mujer (Dalia en español; Jenny, Aria o Ava en inglés); espera a `voiceschanged`; botones de prueba en `/pantalla?debug=1`.
+- **Video de `/pantalla` sin la interfaz de YouTube** (iframe recortado, portada encima, destapa a los 4 s) y portada en lugar del video durante anuncios y al terminar la canción (esto último solo compila; no se probó en vivo).
+- **Bug de Safari** encontrado y arreglado (causa reproducida en WebKit); verificado después con un iPhone real.
+- **Ronda real en producción** con una PC y un iPhone (Safari desde la cámara): votos, cierre con 2 votos y anuncio entre canciones; 3 evidencias.
+- **Auditoría** contra los requisitos del profe (tabla abajo). Sin cambios de código por la auditoría.
+
+## Auditoría contra los requisitos del profe (2026-11-17)
+
+✅ cumple · ⚠️ a medias · ❌ falta.
+
+| # | Requisito | Estado | Dónde está / qué falta | Estimación |
+|---|---|---|---|---|
+| 1 | Reglas contextuales y prioridades desde el panel | ❌ | Solo en la base (`context_rules`, 7 reglas del seed); sin UI ni funciones de acceso a datos. Las políticas RLS ya dejan escribir al admin | 3–4 h |
+| 2 | Playlists y selección de respaldo | ❌ | La tabla y la playlist `respaldo` existen, sin UI; la otra playlist del seed no la usa el algoritmo | 3–4 h |
+| 3 | Supervisar la cola de reproducción | ⚠️ | Monitor: qué suena, ronda abierta con las 2 opciones, ganadora pendiente, últimas 15 reproducciones, controles. No hay una "cola" explícita (lo siguiente se decide por voto) | 1–1,5 h |
+| 4 | Estadísticas, historial y resultados | ⚠️ | Hay historial (15) y gráfica de votos (10 rondas); faltan las estadísticas de participación | 3–4 h |
+| 5 | Admin usable en tableta (768–1024) | ⚠️ | Medido en las 6 pestañas: sin desborde de página; pero a 768 px las acciones de Canciones se cortan a la derecha y las casillas miden 28 px | ~1 h |
+| 6 | `.env.example` sin secretos | ✅ | Solo marcadores; `.env` ignorado; el historial de git no contiene la clave real ni claves secretas | — |
+| 7 | README (instalación, local, despliegue, arquitectura, BD, servicios) | ✅ | `README.md`, `docs/arquitectura.md`, `docs/servicios-y-costos.md` | — |
+| 8 | Crear la base (migraciones en orden + seed) | ✅ | README paso 3 y tabla de migraciones en `docs/arquitectura.md` | — |
+| 9 | Respaldo de configuración y restablecer el servicio | ❌ | No hay exportación ni procedimiento; el seed sobrescribe los ajustes | ~2 h |
+| 10 | Diagrama de flujo | ✅ | `docs/arquitectura.md`: componentes, secuencia de una ronda y estados de `/pantalla` (el flujo de decisión del algoritmo no está: 30 min, opcional) | — |
+| 11 | Funciones simuladas o pendientes | ✅ | README "Funciones simuladas o limitaciones" y "Mejoras futuras" | — |
+| 12 | Etiquetas por canción (género, energía, ambiente, temática, restricciones) | ✅ | Tabla `songs` y `/admin → Canciones` | — |
+
+Total aproximado de lo que falta: 13–16 h. Orden sugerido: 1, 2 y 9 (los más claros frente al enunciado), luego 5, 4 y 3.
+
+## Fase 10: requisitos faltantes (plan y estado a la pausa)
+
+Versiones sencillas, reutilizando los componentes del admin. **Estado real del árbol de trabajo (sin commit):** compila (`npm run build` y `npm run lint` pasan), **nada de esto está probado en vivo** y **no se ha subido a `main`** a propósito.
+
+| Punto | Qué se pidió | Estado |
+|---|---|---|
+| 1. Pestaña "Reglas" | Tabla de `context_rules` con crear, editar, activar/desactivar y borrar (con confirmación), todos los campos, prioridad editable, texto "mayor prioridad gana" (Exámenes sobre horario y temperatura). Probar: cambiar una regla y ver en "Simular contexto" que cambian las opciones | Código escrito, sin probar: `src/types/rule.ts`, funciones en `src/lib/api.ts` (`fetchRules`, `insertRule`, `updateRule`, `deleteRule`), `src/hooks/useAdminRules.ts`, `src/components/RulesPanel.tsx`; pestaña "Reglas" ya conectada en `useAdmin.ts` y `AdminView.tsx` |
+| 2. Pestaña "Playlists" | Ver playlists, agregar o quitar canciones (buscador) y marcar la de respaldo; sin enlazarlas a las reglas | Código escrito, sin probar: `useAdminPlaylists.ts`, `PlaylistsPanel.tsx`, `fetchPlaylists`, `fetchPlaylistLinks`, `addSongToPlaylist`, `removeSongFromPlaylist`, `setFallbackPlaylist` (apaga la anterior y enciende la nueva por el índice único), `insertPlaylist`, `clearPlaylistSongs`; pestaña conectada |
+| 3. Respaldo en Configuración | "Exportar respaldo" (JSON con ajustes, reglas, eventos, anuncios y playlists) e "Importar respaldo" con confirmación; sección "Respaldo y restablecer el servicio" en `docs/manual-admin.md` | Código escrito, sin probar: `src/lib/backup.ts` (exporta, valida, resume y restaura **sin borrar**: sobrescribe por nombre/texto y crea lo que falta; las canciones de las playlists van por `youtube_id`), `src/lib/download.ts`, `useAdminBackup.ts`, `BackupPanel.tsx` (conectado en la pestaña Configuración). **Falta la sección del manual** |
+| 4. Tableta | A 768 px las acciones de Canciones bajan de renglón (o menú) y casillas de 44 px | **No aplicado.** El parche (media query ≤1100 px en `admin.css` y token `--check-tap: 2.75rem`) estaba dentro del comando que falló |
+| 5. Estadísticas en Monitor | Tarjetas: total de rondas, total de votos, promedio por ronda, rondas sin votos, empates y top 5 de canciones más votadas; sin filtro de fechas | Solo `src/lib/stats.ts` (`computeStats`, función pura). `fetchRoundStatsRows` ya está en `api.ts`, pero **falta conectarla** en `useAdminMonitor.ts` y mostrar las tarjetas en `MonitorPanel.tsx` |
+| 6. Tarjeta "Siguiente" | La ganadora parcial de la ronda abierta o "se decide por voto" | **No empezado** (diseño: ronda abierta → quién va ganando o "se decide por voto"/empate parcial; ronda cerrada → la ganadora que sigue) |
+| Docs | README (quitar reglas y playlists de "Mejoras futuras"), `docs/pruebas.md`, `docs/manual-admin.md`, índice y capturas en `docs/evidencias/fase10/` | **Pendiente** |
+
+**Archivos del trabajo en curso (sin commit):** modificados `src/components/AdminView.tsx`, `src/components/admin.css`, `src/hooks/useAdmin.ts`, `src/hooks/useAdminSongs.ts` (expone `all`), `src/lib/api.ts`, `src/types/index.ts`; nuevos `src/components/{BackupPanel,PlaylistsPanel,RulesPanel}.tsx`, `src/hooks/{useAdminBackup,useAdminPlaylists,useAdminRules}.ts`, `src/lib/{backup,download,stats}.ts`, `src/types/rule.ts`.
+
+### Siguiente paso exacto
+
+1. `git status` para ver el trabajo en curso (no se perdió nada) y levantar `npm run dev` (puerto 5199). La sesión de admin de Playwright sigue iniciada en `localhost:5199`; si no, entrar con la cuenta de pruebas.
+2. **Probar lo ya escrito, con sesión de admin, antes de seguir:** (a) pestaña **Reglas**: editar la regla "Tarde y noche (relajada)" a energía 1–1, mirar en **Simular contexto** ("Madrugada tranquila") que cambian las opciones, y **restaurar** el valor original 2–4; probar también la prioridad de "Exámenes (instrumental)" (100) bajándola por debajo de 20 y volviéndola a 100; (b) pestaña **Playlists**: agregar y quitar una canción de `respaldo` y cambiar el respaldo a otra playlist y regresarlo; (c) **Configuración → Respaldo**: exportar, importar el mismo archivo (debe actualizar sin duplicar) y un archivo con una prioridad cambiada para ver que se restaura. Todo lo que se cree debe llevar "PRUEBA" y se limpia por id.
+3. **Aplicar los puntos 4, 5 y 6** (CSS de tableta y token; conectar `stats`/`top`/`next` en `useAdminMonitor.ts`; tarjetas en `MonitorPanel.tsx`) y probar a 768×1024 y en el Monitor con datos.
+4. Docs: README, `docs/pruebas.md`, `docs/manual-admin.md` (nueva sección "Respaldo y restablecer el servicio": proyecto pausado → reactivar en Supabase; recargar `/pantalla`; importar el respaldo; reaplicar migraciones), índice de evidencias y capturas en `docs/evidencias/fase10/`.
+5. `npm run build` + `npm run lint`, pedir un solo OK y hacer un único commit + push de la Fase 10.
 
 ## Bug del iPhone con Safari: "permission denied for function cast_vote" (2026-11-17)
 
@@ -36,7 +93,7 @@
 - **Prueba (WebKit/iPhone 13, `castVote` real, sin escribir datos: ronda inexistente → `not_found` si va autenticado):** normal OK; clave de sesión borrada de `localStorage` OK; `localStorage` lanzando `SecurityError` OK; sesión perdida por completo (nueva sesión anónima) OK; servidor responde 401/42501 a la primera llamada → reintento con sesión nueva OK. **Antes del arreglo**, el segundo caso daba 401/42501.
 - **Límites:** (1) rehacer la sesión anónima crea otra identidad: si alguien ya había votado con la anterior y la perdió, podría votar otra vez (límite conocido del voto anónimo). (2) No se probó en un iPhone real; **antes de la demo, votar desde un iPhone con Safari** (y, si falla, abrir la consola/`Develop` o mirar de nuevo los logs de la API). (3) En desarrollo React crea la sesión dos veces (StrictMode); en producción es una. **Verificado en un iPhone real el 2026-11-17** (Safari abierto desde la cámara): voto registrado; evidencia en `docs/evidencias/demo/`.
 
-## Fase 9 (pulido y documentación): en curso (2026-11-17)
+## Fase 9 (pulido y documentación): hecha y desplegada, commit `b3f9d98` (2026-11-17)
 
 - **Bloque 1, pulido (hecho, verificado en vivo; capturas en `docs/evidencias/fase9/`):** "Borrar" con borde de peligro y confirmación ("Sí, borrar" / "No"); acciones de la tabla de canciones en un solo renglón; configuración en 2 columnas en escritorio; `/pantalla` sin hueco entre las opciones y el QR (el bloque se centra; en 1366×768 sigue sin scroll); `/votar` ya no parpadea al recargar con el voto emitido: muestra "Sintonizando…" hasta saber si ya votaste y la secuencia medida es Sintonizando → Voto registrado, sin pasar por las opciones activas.
 - **Bloque 2, documentación (escrita):** `README.md` (instalación, uso, limitaciones, créditos, mejoras futuras), `docs/arquitectura.md` (diagramas Mermaid de arquitectura, ronda, fases y base de datos), `docs/manual-admin.md` (sin contraseñas), `docs/servicios-y-costos.md`, `docs/evidencias/README.md` (índice) y la tabla de criterios de aceptación al inicio de `docs/pruebas.md`.
