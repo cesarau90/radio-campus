@@ -30,3 +30,7 @@ dist-ssr
 # Artefactos de pruebas con Playwright
 .playwright-mcp
 .vercel
+
+# Audio completo de ElevenLabs (solo se suben los clips ya cortados)
+docs/voz/voz_completa.mp3
+docs/voz/voz_completa2.mp3

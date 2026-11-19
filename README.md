@@ -100,6 +100,10 @@ React 19 · Vite · TypeScript · React Router · Supabase (Postgres, Auth, Real
 - **Software:** React, Vite, TypeScript, React Router, Supabase y qrcode.react.
 - **Desarrollo asistido por IA:** el código se construyó con ayuda de Claude Code (Anthropic), bajo la dirección y revisión del equipo; los commits llevan la coautoría.
 
+### Créditos de voz
+
+Las voces pregrabadas de `/pantalla` (frases fijas y los títulos de las canciones) se generaron con [ElevenLabs](https://elevenlabs.io), plan gratis, voz **Kate**. Uso escolar, no comercial. Si un clip falta o no arranca en 3 s, lo dice la voz del navegador.
+
 ## Mejoras futuras
 
 - **TTS en la nube (ElevenLabs / Azure) vía Edge Function**, para que la voz sea la misma en cualquier navegador.

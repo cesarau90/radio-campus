@@ -1,4 +1,4 @@
-import { useAnnouncementAudio } from './useAnnouncementAudio'
+import { CLIP_START_TIMEOUT_MS, useAnnouncementAudio } from './useAnnouncementAudio'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   closeRound,
@@ -10,7 +10,8 @@ import {
   startRound,
 } from '../lib/api'
 import { playSeconds } from '../lib/playback'
-import { newRoundSegments, nowPlayingSegments, roundResultSegments } from '../lib/speech'
+import { nowPlayingSegments } from '../lib/speech'
+import { newRoundPieces, roundResultPieces, type Piece } from '../lib/voiceClips'
 import { weatherLabel } from '../lib/weather'
 import { formatClock } from '../lib/time'
 import { percentages } from '../lib/votes'
@@ -27,6 +28,7 @@ import type { PantallaViewName, RoundOption, Song, TallyRow } from '../types'
 
 const STEP_MS = 1000
 const RETRY_MS = 3000
+const PIECE_GAP_MS = 150 // pausa corta entre los clips de la voz pregrabada
 const MAX_ERROR_STREAK = 3 // tres canciones seguidas que no suenan: se detiene el reemplazo automático
 
 /**
@@ -70,6 +72,30 @@ export function usePantalla() {
   const { speak } = speech
   const annAudio = useAnnouncementAudio()
   const { play: playAudio } = annAudio
+
+  // Voz pregrabada: los pedazos suenan en fila (una sola secuencia a la vez), con ~150 ms entre clips y la música
+  // atenuada durante toda la secuencia. Si un clip falta o falla, ese pedazo lo dice la voz del navegador.
+  const [sequencing, setSequencing] = useState(false)
+  const queue = useRef<Promise<void>>(Promise.resolve())
+  const sayPieces = useCallback(
+    (pieces: Piece[]): Promise<void> => {
+      const run = async () => {
+        setSequencing(true)
+        try {
+          for (let i = 0; i < pieces.length; i++) {
+            if (i > 0) await new Promise((r) => setTimeout(r, PIECE_GAP_MS))
+            const ok = await playAudio(pieces[i].url, CLIP_START_TIMEOUT_MS).catch(() => false)
+            if (!ok) await speak(pieces[i].fallback)
+          }
+        } finally {
+          setSequencing(false)
+        }
+      }
+      queue.current = queue.current.then(run, run)
+      return queue.current
+    },
+    [playAudio, speak],
+  )
   const player = useYouTubePlayer({
     videoId: nowSong?.youtube_id ?? null,
     startedAt: playback?.started_at ?? null,
@@ -77,7 +103,7 @@ export function usePantalla() {
     nowMs: clock.nowMs,
     ready: clock.ready && !live.loading,
     paused: settings?.paused ?? false,
-    duck: speech.speaking || annAudio.playing,
+    duck: speech.speaking || annAudio.playing || sequencing,
     onError: handlePlayerError,
   })
   useEffect(() => {
@@ -208,16 +234,16 @@ export function usePantalla() {
     if (view === 'voting' && songA && songB && spoken.current.open !== round.id) {
       spoken.current.open = round.id
       if (nowMs() - new Date(round.starts_at).getTime() < 15_000) {
-        void speak(newRoundSegments(songA, songB))
+        void sayPieces(newRoundPieces(songA, songB))
       }
     }
     if (view === 'result' && winner && spoken.current.result !== round.id) {
       spoken.current.result = round.id
       if (nowMs() - new Date(round.ends_at).getTime() < 30_000) {
-        void speak(roundResultSegments(winner, round.resolution === 'empate'))
+        void sayPieces(roundResultPieces(winner, round.resolution === 'empate'))
       }
     }
-  }, [view, round, winner, songA, songB, nowMs, speak])
+  }, [view, round, winner, songA, songB, nowMs, sayPieces])
 
   // Cinta de avisos: clima, cómo votar y un recordatorio de la radio.
   const tickerItems = [

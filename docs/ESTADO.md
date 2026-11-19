@@ -1,6 +1,12 @@
 # Estado del proyecto (para retomar)
 
-Última actualización: 2026-11-17, al cierre del día (Fase 10 hecha y en `main`). Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
+Última actualización: 2026-11-19 (Fase 13 en `main`; antes, Fase 10 el 2026-11-17). Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
+
+## Fase 13 (2026-11-19): voz pregrabada de ElevenLabs (voz Kate) en `/pantalla` ✅
+
+- 67 clips en `public/audio/voz/` (7 frases fijas `frase_*.mp3` + 60 canciones `<youtube_id>.mp3`), guion y orden en `docs/voz/` (`guion.txt`, `orden.json`; ~2,500 caracteres de los 10,000 del plan gratis). Los audios completos `voz_completa*.mp3` están en `.gitignore`.
+- `src/lib/voiceClips.ts` arma las secuencias (nueva ronda: votar → Opción A → clip A → Opción B → clip B; resultado: ronda cerrada → empate → sigue → ganadora). `sayPieces` en `usePantalla` las reproduce en fila con `useAnnouncementAudio` (150 ms entre clips, música atenuada toda la secuencia). Si un clip falta o no arranca en 3 s (`CLIP_START_TIMEOUT_MS`), ese pedazo lo dice Dalia. Los anuncios del admin siguen igual (10 s).
+- README "Créditos de voz" y `docs/servicios-y-costos.md` (plan gratis, atribución, uso escolar). Probado en el preview de `fase13` (Kate suena bien en ronda y resultado; base limpia).
 
 ## Fase 12 (2026-11-19): audio MP3 opcional en anuncios ✅
 

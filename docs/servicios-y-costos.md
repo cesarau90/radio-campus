@@ -13,7 +13,7 @@ El sistema funciona **sin servidor propio y con servicios gratuitos**. Costo tot
 | [YouTube oEmbed](https://oembed.com) y miniaturas (`img.youtube.com`) | Comprobar que un video exista y mostrar su portada | Gratuito | $0 | Sin clave; las portadas son de sus titulares |
 | [Open-Meteo](https://open-meteo.com) | Temperatura actual de Tampico (consulta cada 15 min) | Gratuito, sin clave | $0 | Solo uso no comercial y límite diario holgado (se hacen ~96 consultas al día por pantalla); atribución CC BY 4.0 |
 | Web Speech API (`speechSynthesis`) | La voz de la radio | Integrada en el navegador | $0 | Las voces dependen del navegador y del sistema; con Microsoft Edge hay voces "Natural" sin costo |
-| [ElevenLabs](https://elevenlabs.io/pricing) | Generar a mano el MP3 con voz femenina mexicana de los anuncios (opcional; se guarda en `public/audio/`) | Gratis | $0 | El plan gratis exige **atribución** y **no permite uso comercial** (cumple: uso escolar); cuota mensual de caracteres; sin MP3 se usa la voz del navegador |
+| [ElevenLabs](https://elevenlabs.io/pricing) | Generar a mano los 67 clips de voz de `/pantalla` (frases fijas y las 60 canciones, voz **Kate**, mujer; en `public/audio/voz/`) y, opcional, el MP3 de los anuncios (`public/audio/`) | Gratis | $0 | El plan gratis exige **atribución** (voz de ElevenLabs) y **no permite uso comercial** (cumple: uso escolar); cuota de 10,000 caracteres al mes (el guion usa ~2,500); si un clip falta o falla, ese pedazo lo dice la voz del navegador |
 | Google Fonts | Tipografías (Bricolage Grotesque, DM Mono, DM Serif Display) | Gratuito | $0 | Licencia OFL |
 
 ## Qué pasa si crece el uso
