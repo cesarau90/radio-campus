@@ -10,7 +10,7 @@
 insert into public.songs (youtube_id, title, artist, duration_sec, genre, energy, mood, theme)
 select v.* from (values
   ('DUT5rEU6pqM', 'Hips Don''t Lie', 'Shakira ft. Wyclef Jean', 218, 'pop', 4, 'alegre', null::text),
-  ('6Mgqbai3fKo', 'Chantaje', 'Shakira ft. Maluma', 199, 'pop', 4, 'alegre', null),
+  ('6Mgqbai3fKo', 'Chantaje', 'Shakira ft. Maluma', 199, 'pop latino', 4, 'alegre', null),
   ('2Vv-BfVoq4g', 'Perfect', 'Ed Sheeran', 282, 'pop', 2, 'romantico', null),
   ('rYEDA3JcQqw', 'Rolling in the Deep', 'Adele', 234, 'pop', 4, 'intenso', null),
   ('4NRXx6U8ABQ', 'Blinding Lights', 'The Weeknd', 263, 'pop', 4, 'energico', null),
@@ -19,7 +19,7 @@ select v.* from (values
   ('dvgZkm1xWPE', 'Viva La Vida', 'Coldplay', 242, 'rock', 4, 'intenso', null),
   ('HgzGwKwLmgM', 'Don''t Stop Me Now', 'Queen', 215, 'rock', 5, 'alegre', null),
   ('T_FkEw27XJ0', 'De Música Ligera', 'Soda Stereo', 210, 'rock', 4, 'alegre', null),
-  ('98Akpf1ph2o', 'Eres', 'Café Tacvba', 264, 'rock', 2, 'romantico', null),
+  ('98Akpf1ph2o', 'Eres', 'Café Tacvba', 264, 'rock latino', 2, 'romantico', null),
   ('ETLoTxVVvjM', 'Adiós Amor', 'Christian Nodal', 202, 'regional mexicano', 3, 'melancolico', null),
   ('kcKOd_wy0XI', '17 Años', 'Los Ángeles Azules ft. Jay De La Cueva', 301, 'regional mexicano', 4, 'alegre', null),
   ('gCYcHz2k5x0', 'Animals', 'Martin Garrix', 192, 'electronica', 5, 'energico', null),
