@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 
 /**
  * Lleva al usuario al formulario de edición y lo regresa a su fila al terminar.
- * - Al abrir (editingId pasa a tener valor): scroll suave al formulario, foco en su primer campo y un destello naranja.
+ * - Al abrir o cambiar de fila (editingId pasa a tener otro valor): scroll suave al formulario, foco en su primer campo y un destello naranja.
  * - Al cerrar (guardar o cancelar): scroll de vuelta a la fila editada (`data-row-id`) o, si era "nuevo", al botón que lo abrió.
  * Uso: `useEditFocus(editingId)` en el hook del CRUD; `<form data-edit-form>` y `<tr data-row-id={id}>`.
  */
@@ -16,9 +16,11 @@ export function useEditFocus(editingId: string | null) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const behavior: ScrollBehavior = reduce ? 'auto' : 'smooth'
 
-    if (editingId !== null && prev === null) {
-      const active = document.activeElement
-      trigger.current = active instanceof HTMLElement && active !== document.body ? active : null
+    if (editingId !== null && prev !== editingId) {
+      if (prev === null) {
+        const active = document.activeElement
+        trigger.current = active instanceof HTMLElement && active !== document.body ? active : null
+      }
       const form = document.querySelector<HTMLFormElement>('form[data-edit-form]')
       if (!form) return
       form.scrollIntoView({ behavior, block: 'start' })
