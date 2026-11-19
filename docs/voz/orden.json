@@ -1,0 +1,270 @@
+[
+  {
+    "archivo": "frase_votar.mp3",
+    "texto": "Ya puedes votar desde tu celular."
+  },
+  {
+    "archivo": "frase_opcion_a.mp3",
+    "texto": "Opción A."
+  },
+  {
+    "archivo": "frase_opcion_b.mp3",
+    "texto": "Opción B."
+  },
+  {
+    "archivo": "frase_ronda_cerrada.mp3",
+    "texto": "Ronda cerrada."
+  },
+  {
+    "archivo": "frase_empate.mp3",
+    "texto": "Hubo empate."
+  },
+  {
+    "archivo": "frase_sigue.mp3",
+    "texto": "Sigue."
+  },
+  {
+    "archivo": "frase_ahora_suena.mp3",
+    "texto": "Ahora suena."
+  },
+  {
+    "archivo": "JGwWNGJdvx8.mp3",
+    "texto": "Shape of You, de Ed Sheeran."
+  },
+  {
+    "archivo": "OPf0YbXqDm0.mp3",
+    "texto": "Uptown Funk, de Mark Ronson y Bruno Mars."
+  },
+  {
+    "archivo": "kJQP7kiw5Fk.mp3",
+    "texto": "Despacito, de Luis Fonsi y Daddy Yankee."
+  },
+  {
+    "archivo": "YykjpeuMNEk.mp3",
+    "texto": "Hymn for the Weekend, de Coldplay."
+  },
+  {
+    "archivo": "450p7goxZqg.mp3",
+    "texto": "All of Me, de John Legend."
+  },
+  {
+    "archivo": "ZbZSe6N_BXs.mp3",
+    "texto": "Happy, de Pharrell Williams."
+  },
+  {
+    "archivo": "pRpeEdMmmQ0.mp3",
+    "texto": "Waka Waka, de Shakira."
+  },
+  {
+    "archivo": "NUsoVlDFqZg.mp3",
+    "texto": "Bailando, de Enrique Iglesias."
+  },
+  {
+    "archivo": "fJ9rUzIMcZQ.mp3",
+    "texto": "Bohemian Rhapsody, de Queen."
+  },
+  {
+    "archivo": "hTWKbfoikeg.mp3",
+    "texto": "Smells Like Teen Spirit, de Nirvana."
+  },
+  {
+    "archivo": "1w7OgIMMRc4.mp3",
+    "texto": "Sweet Child O' Mine, de Guns N' Roses."
+  },
+  {
+    "archivo": "v2AC41dglnM.mp3",
+    "texto": "Thunderstruck, de AC DC."
+  },
+  {
+    "archivo": "lDK9QqIzhwk.mp3",
+    "texto": "Livin' on a Prayer, de Bon Jovi."
+  },
+  {
+    "archivo": "IcrbM1l_BoI.mp3",
+    "texto": "Wake Me Up, de Avicii."
+  },
+  {
+    "archivo": "_ovdm2yX4MA.mp3",
+    "texto": "Levels, de Avicii."
+  },
+  {
+    "archivo": "kOkQ4T5WO9E.mp3",
+    "texto": "This Is What You Came For, de Calvin Harris y Rihanna."
+  },
+  {
+    "archivo": "FGBhQbmPwH8.mp3",
+    "texto": "One More Time, de Daft Punk."
+  },
+  {
+    "archivo": "60ItHLz5WEA.mp3",
+    "texto": "Faded, de Alan Walker."
+  },
+  {
+    "archivo": "CvFH_6DNRCY.mp3",
+    "texto": "Clair de Lune, de Claude Debussy."
+  },
+  {
+    "archivo": "9E6b3swbnWg.mp3",
+    "texto": "Nocturne Opus 9, número 2, de Frédéric Chopin."
+  },
+  {
+    "archivo": "NlprozGcs80.mp3",
+    "texto": "Canon in D, de Johann Pachelbel."
+  },
+  {
+    "archivo": "7maJOI3QMu0.mp3",
+    "texto": "River Flows in You, de Yiruma."
+  },
+  {
+    "archivo": "hN_q-_nGv4U.mp3",
+    "texto": "Experience, de Ludovico Einaudi."
+  },
+  {
+    "archivo": "S-Xm7s9eGxU.mp3",
+    "texto": "Gymnopédie número 1, de Erik Satie."
+  },
+  {
+    "archivo": "sR2W2scFS4Y.mp3",
+    "texto": "Nuvole Bianche, de Ludovico Einaudi."
+  },
+  {
+    "archivo": "ugNQ5uIN09Q.mp3",
+    "texto": "Volver, Volver, de Vicente Fernández."
+  },
+  {
+    "archivo": "rryDND06LHU.mp3",
+    "texto": "La Puerta Negra, de Los Tigres del Norte."
+  },
+  {
+    "archivo": "NCvJwzDQTBM.mp3",
+    "texto": "La Bikina, de Luis Miguel."
+  },
+  {
+    "archivo": "g2BzGJnNvEw.mp3",
+    "texto": "Ya Supérame, de Grupo Firme."
+  },
+  {
+    "archivo": "jhMiIUb2GEA.mp3",
+    "texto": "Primera Cita, de Carín León."
+  },
+  {
+    "archivo": "nxXvOEPsE0s.mp3",
+    "texto": "Cómo Te Voy a Olvidar, de Los Ángeles Azules."
+  },
+  {
+    "archivo": "bb5K3vpNEvw.mp3",
+    "texto": "Amorcito Corazón, de Pedro Infante."
+  },
+  {
+    "archivo": "OHeHOb3E-2g.mp3",
+    "texto": "Cielito Lindo, de Mariachi Nuevo Tecalitlán."
+  },
+  {
+    "archivo": "yXQViqx6GMY.mp3",
+    "texto": "All I Want for Christmas Is You, de Mariah Carey."
+  },
+  {
+    "archivo": "E8gmARGvPlI.mp3",
+    "texto": "Last Christmas, de Wham."
+  },
+  {
+    "archivo": "xMtuVP8Mj4o.mp3",
+    "texto": "Feliz Navidad, de José Feliciano."
+  },
+  {
+    "archivo": "nlR0MkrRklg.mp3",
+    "texto": "Santa Tell Me, de Ariana Grande."
+  },
+  {
+    "archivo": "TFsZy9t-qDc.mp3",
+    "texto": "Rockin' Around the Christmas Tree, de Brenda Lee."
+  },
+  {
+    "archivo": "QJ5DOWPGxwg.mp3",
+    "texto": "It's Beginning to Look a Lot Like Christmas, de Michael Bublé."
+  },
+  {
+    "archivo": "DUT5rEU6pqM.mp3",
+    "texto": "Hips Don't Lie, de Shakira y Wyclef Jean."
+  },
+  {
+    "archivo": "6Mgqbai3fKo.mp3",
+    "texto": "Chantaje, de Shakira y Maluma."
+  },
+  {
+    "archivo": "2Vv-BfVoq4g.mp3",
+    "texto": "Perfect, de Ed Sheeran."
+  },
+  {
+    "archivo": "rYEDA3JcQqw.mp3",
+    "texto": "Rolling in the Deep, de Adele."
+  },
+  {
+    "archivo": "4NRXx6U8ABQ.mp3",
+    "texto": "Blinding Lights, de The Weeknd."
+  },
+  {
+    "archivo": "wnJ6LuUFpMo.mp3",
+    "texto": "Mi Gente, de J Balvin y Willy William."
+  },
+  {
+    "archivo": "TmKh7lAwnBI.mp3",
+    "texto": "Dákiti, de Bad Bunny y Jhay Cortez."
+  },
+  {
+    "archivo": "dvgZkm1xWPE.mp3",
+    "texto": "Viva La Vida, de Coldplay."
+  },
+  {
+    "archivo": "HgzGwKwLmgM.mp3",
+    "texto": "Don't Stop Me Now, de Queen."
+  },
+  {
+    "archivo": "T_FkEw27XJ0.mp3",
+    "texto": "De Música Ligera, de Soda Stereo."
+  },
+  {
+    "archivo": "98Akpf1ph2o.mp3",
+    "texto": "Eres, de Café Tacvba."
+  },
+  {
+    "archivo": "ETLoTxVVvjM.mp3",
+    "texto": "Adiós Amor, de Christian Nodal."
+  },
+  {
+    "archivo": "kcKOd_wy0XI.mp3",
+    "texto": "Diecisiete años, de Los Ángeles Azules y Jay De La Cueva."
+  },
+  {
+    "archivo": "gCYcHz2k5x0.mp3",
+    "texto": "Animals, de Martin Garrix."
+  },
+  {
+    "archivo": "1y6smkh6c-0.mp3",
+    "texto": "Don't You Worry Child, de Swedish House Mafia y John Martin."
+  },
+  {
+    "archivo": "oy2zDJPIgwc.mp3",
+    "texto": "Eine Kleine Nachtmusik, de Wolfgang Amadeus Mozart."
+  },
+  {
+    "archivo": "NvryolGa19A.mp3",
+    "texto": "Comptine d'un autre été, de Yann Tiersen."
+  },
+  {
+    "archivo": "j1Ck42-_btY.mp3",
+    "texto": "Una Mattina, de Ludovico Einaudi."
+  },
+  {
+    "archivo": "e_AMTbO50vU.mp3",
+    "texto": "A Holly Jolly Christmas, de Burl Ives."
+  },
+  {
+    "archivo": "R8CBoVc_OMI.mp3",
+    "texto": "Santa Claus Is Coming To Town, de Michael Bublé."
+  },
+  {
+    "archivo": "AN_R4pR1hck.mp3",
+    "texto": "It's the Most Wonderful Time of the Year, de Andy Williams."
+  }
+]

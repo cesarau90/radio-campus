@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 const GRACE_SEC = 5
 /** Si el MP3 no empieza a sonar en este tiempo, se da por fallido y se usa la voz. */
 const START_TIMEOUT_MS = 10_000
+/** Para los clips de voz pregrabada: si no arrancan en 3 s, entra la voz del navegador. */
+export const CLIP_START_TIMEOUT_MS = 3_000
 
 /**
  * Reproduce el MP3 de un anuncio. `play` devuelve true si sonó completo (o se cortó por el límite de seguridad)
@@ -26,11 +28,11 @@ export function useAnnouncementAudio() {
   }, [audio])
 
   const play = useCallback(
-    (url: string): Promise<boolean> =>
+    (url: string, startTimeoutMs: number = START_TIMEOUT_MS): Promise<boolean> =>
       new Promise((resolve) => {
         const a = audio()
         let started = false
-        let timer = window.setTimeout(() => finish(false), START_TIMEOUT_MS)
+        let timer = window.setTimeout(() => finish(false), startTimeoutMs)
         function finish(ok: boolean) {
           window.clearTimeout(timer)
           a.onended = a.onerror = a.onplaying = a.onloadedmetadata = null
