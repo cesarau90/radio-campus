@@ -115,7 +115,9 @@ Versiones sencillas, reutilizando los componentes del admin. **Estado real del �
 - **Cambio chico (2026-11-17):** durante un anuncio y cuando el tiempo de la canción ya terminó, `/pantalla` muestra la portada en lugar del video (antes se veía el último cuadro congelado, visible en la evidencia). Compilado; no se probó en vivo porque requiere un anuncio real en pantalla.
 - **Pendiente tuyo:** limpiar los datos de prueba (rondas, historial, votos).
 
-## Voz de la radio (2026-11-17): una sola ruta, dos idiomas, voces de mujer
+## Voz de la radio (2026-11-17): una sola ruta, dos idiomas (ACTUALIZADO 2026-11-19: ahora es Jorge, no mujer)
+
+- **Cambio 2026-11-19: la voz en español es "Microsoft Jorge Online (Natural)" (es-MX, Edge)** con `rate` 1.05 y `pitch` 1.1 (más animada); si no existe Jorge, cae a Dalia y luego al resto de la cadena. El inglés no cambió (Jenny/Aria/Ava). Se cancela la voz ElevenLabs/Antonio; el soporte de MP3 por anuncio sigue en el código (opcional). Sin escuchar en vivo (no se abrió /pantalla). Lo de abajo describe la versión anterior con Dalia.
 
 - **Una sola función:** `useSpeech.speak` es el único lugar que crea `SpeechSynthesisUtterance` (`/pantalla`, "Probar voz" del admin y el desbloqueo con el clic). En la primera frase de la sesión, si todavía no hay una voz Natural en español, espera hasta 2,5 s a que Edge las cargue, y el utterance de desbloqueo usa la misma voz elegida (silencioso). Commit `f9ee56a`.
 - **La voz es Dalia (Edge)** — decisión del usuario (2026-11-17): voces de MUJER. Español: `Dalia` Natural → cualquier es-MX Natural de mujer → cualquier es-MX → es-US → cualquier es. Inglés (títulos y artistas): `Jenny`, `Aria` o `Ava` Natural (en ese orden) → cualquier en-US Natural de mujer → cualquier en-US → cualquier en. "De mujer" se decide descartando nombres masculinos conocidos (`MALE_NAME` en `src/lib/speech.ts`). Probado con listas de voces simuladas (todas las prioridades); el audio real solo se oye en Edge. Antes se había configurado Jorge/Andrew (voces de hombre) y el usuario lo cambió.

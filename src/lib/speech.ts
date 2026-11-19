@@ -118,10 +118,11 @@ const isFemale = (v: SpeechSynthesisVoice) => !MALE_NAME.test(v.name)
 /** La voz de mujer si hay alguna; si no, la primera. */
 const preferFemale = (list: SpeechSynthesisVoice[]) => list.find(isFemale) ?? list[0]
 
-/** Español (voz de mujer): "Dalia" Natural → es-MX Natural de mujer → es-MX → es-US → cualquier español. */
+/** Español: "Jorge" Natural (es-MX) → respaldo "Dalia" Natural → es-MX Natural de mujer → es-MX → es-US → cualquier español. */
 export function pickSpanishVoice(voices: SpeechSynthesisVoice[]): SpeechSynthesisVoice | undefined {
   const mx = voices.filter((v) => norm(v.lang) === 'es-mx')
   return (
+    mx.find((v) => /jorge/i.test(v.name) && isNatural(v)) ??
     mx.find((v) => /dalia/i.test(v.name) && isNatural(v)) ??
     mx.find((v) => isNatural(v) && isFemale(v)) ??
     preferFemale(mx) ??

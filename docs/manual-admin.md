@@ -119,7 +119,7 @@ La lista completa, con lo que se hace en Supabase, está en [ESTADO.md](ESTADO.m
 | Síntoma | Qué revisar |
 |---|---|
 | `/pantalla` no suena | Pulsar **Activar sonido** (el navegador bloquea el audio hasta un clic); comprobar que la radio no esté en pausa |
-| La voz suena distinta o de mujer | Abrir en **Microsoft Edge**; en otros navegadores se usa la voz del sistema |
+| La voz suena distinta a Jorge | Abrir en **Microsoft Edge**; en otros navegadores se usa la voz del sistema |
 | Los celulares ven "No pudimos conectar" | Límite de inicios de sesión anónimos por IP en Supabase (*Authentication → Rate Limits*) |
 | Un video no suena | Está eliminado o no permite incrustarse: la radio lo salta y lo registra; desactívalo en Canciones |
 | Las opciones no cambian con el contexto | Hay una simulación activa (o no hay temperatura y se usa el respaldo); revisa el contexto de la ronda en el Monitor |
