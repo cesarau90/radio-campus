@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { deleteSong, fetchAllSongs, insertSong, updateSong } from '../lib/api'
 import { cleanAuthor, extractVideoId, fetchDuration, fetchOEmbed } from '../lib/youtube'
 import type { Song, SongInput } from '../types'
+import { useEditFocus } from './useEditFocus'
 
 export type SongFilter = 'todas' | 'activas' | 'inactivas' | 'restringidas'
 
@@ -81,6 +82,7 @@ export function useAdminSongs(enabled: boolean) {
   const [filter, setFilter] = useState<SongFilter>('todas')
 
   const [editingId, setEditingId] = useState<string | 'new' | null>(null)
+  useEditFocus(editingId)
   const [draft, setDraft] = useState<SongDraft>(EMPTY)
   const [lookup, setLookup] = useState<LookupState>({ status: 'idle', message: '' })
   const [saving, setSaving] = useState(false)

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { deleteRule, fetchRules, insertRule, updateRule } from '../lib/api'
 import type { ContextRule, ContextRuleInput, EventType } from '../types'
+import { useEditFocus } from './useEditFocus'
 
 export interface RuleDraft {
   name: string
@@ -138,6 +139,7 @@ export function useAdminRules(enabled: boolean) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | 'new' | null>(null)
+  useEditFocus(editingId)
   const [draft, setDraft] = useState<RuleDraft>(EMPTY)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)

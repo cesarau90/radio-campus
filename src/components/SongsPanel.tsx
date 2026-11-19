@@ -33,6 +33,7 @@ export default function SongsPanel({ songs: s }: { songs: AdminSongsModel }) {
 
       {s.editingId !== null && (
         <form
+          data-edit-form
           className="ad-group"
           onSubmit={(e) => {
             e.preventDefault()
@@ -149,7 +150,7 @@ export default function SongsPanel({ songs: s }: { songs: AdminSongsModel }) {
             </thead>
             <tbody>
               {s.songs.map((song) => (
-                <tr key={song.id} className={song.active && !song.restricted ? '' : 'is-off'}>
+                <tr key={song.id} data-row-id={song.id} className={song.active && !song.restricted ? '' : 'is-off'}>
                   <td>
                     <span className="ad-song">
                       <span className="ad-song-cover">

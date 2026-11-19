@@ -35,6 +35,7 @@ export default function RulesPanel({ rules: r, genres, moods, themes }: Props) {
 
       {r.editingId !== null && (
         <form
+          data-edit-form
           className="ad-group"
           onSubmit={(e) => {
             e.preventDefault()
@@ -131,7 +132,7 @@ export default function RulesPanel({ rules: r, genres, moods, themes }: Props) {
             </thead>
             <tbody>
               {r.rules.map((rule) => (
-                <tr key={rule.id} className={rule.active ? '' : 'is-off'}>
+                <tr key={rule.id} data-row-id={rule.id} className={rule.active ? '' : 'is-off'}>
                   <td className="mono ad-priority">{rule.priority}</td>
                   <td>
                     <strong>{rule.name}</strong>

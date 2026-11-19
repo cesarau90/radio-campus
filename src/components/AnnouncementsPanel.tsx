@@ -43,6 +43,7 @@ export default function AnnouncementsPanel({ announcements: an, nowMs }: Props) 
 
       {an.editingId !== null && (
         <form
+          data-edit-form
           className="ad-group"
           onSubmit={(e) => {
             e.preventDefault()
@@ -114,7 +115,7 @@ export default function AnnouncementsPanel({ announcements: an, nowMs }: Props) 
               {an.items.map((a) => {
                 const status = announcementStatus(a, nowMs)
                 return (
-                  <tr key={a.id} className={status === 'al-aire' ? '' : 'is-off'}>
+                  <tr key={a.id} data-row-id={a.id} className={status === 'al-aire' ? '' : 'is-off'}>
                     <td className="ad-cell-text">{a.text}</td>
                     <td className="ad-hint">{schedule(a)}</td>
                     <td>

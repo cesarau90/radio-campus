@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { deleteAnnouncement, fetchAnnouncements, insertAnnouncement, updateAnnouncement } from '../lib/api'
 import { fromLocalInput, toLocalInput } from '../lib/datetime'
 import type { Announcement, AnnouncementInput } from '../types'
+import { useEditFocus } from './useEditFocus'
 
 export const MAX_TEXT = 280
 
@@ -86,6 +87,7 @@ export function useAdminAnnouncements(enabled: boolean, speak: (text: string) =>
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | 'new' | null>(null)
+  useEditFocus(editingId)
   const [draft, setDraft] = useState<AnnouncementDraft>(EMPTY)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)

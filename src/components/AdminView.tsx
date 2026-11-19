@@ -13,6 +13,17 @@ import SimulatorPanel from './SimulatorPanel'
 import SongsPanel from './SongsPanel'
 import StatusNotice from './StatusNotice'
 
+/** Fondo decorativo: tres manchas difusas (solo CSS). */
+function Aurora() {
+  return (
+    <div className="ad-aurora" aria-hidden="true">
+      <i />
+      <i />
+      <i />
+    </div>
+  )
+}
+
 /** Pantalla completa de /admin. Solo pinta el modelo que arma useAdmin; no tiene lógica propia. */
 export default function AdminView(m: AdminModel) {
   if (m.loading) {
@@ -25,6 +36,7 @@ export default function AdminView(m: AdminModel) {
   if (!m.isAdmin) {
     return (
       <div className="ad-app">
+        <Aurora />
         <AdminLogin error={m.loginError} onLogin={m.login} />
       </div>
     )
@@ -32,6 +44,7 @@ export default function AdminView(m: AdminModel) {
 
   return (
     <div className="ad-app">
+      <Aurora />
       <header className="ad-top">
         <span className="ad-brand">
           <DialMark size={28} />

@@ -12,7 +12,7 @@
   margin-inline: auto;
   padding: var(--space-4);
   color: var(--color-text);
-  background: var(--color-bg);
+  /* sin fondo propio: el de html se ve y la aurora (z-index -1) queda detrás del contenido */
 }
 
 /* ---------- barra superior y pestañas ---------- */
@@ -706,4 +706,72 @@
   display: flex;
   justify-content: space-between;
   gap: var(--space-3);
+}
+
+/* ---------- destello del formulario al abrirse ---------- */
+.ad-flash {
+  animation: ad-flash 1.6s ease-out;
+  scroll-margin-top: var(--space-4);
+}
+@keyframes ad-flash {
+  0%, 35% {
+    border-color: var(--color-signal);
+    box-shadow: 0 0 0 3px var(--color-signal), 0 0 28px rgb(255 107 0 / 0.45);
+  }
+  100% {
+    border-color: var(--color-line);
+    box-shadow: 0 0 0 0 transparent, 0 0 0 transparent;
+  }
+}
+
+/* ---------- fondo "aurora" (solo /admin): manchas difusas que van y vienen lento ---------- */
+.ad-aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ad-aurora i {
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.18;
+  will-change: transform, opacity;
+}
+.ad-aurora i:nth-child(1) {
+  top: -20vmax;
+  left: -15vmax;
+  background: #ff6b00;
+  animation: ad-aurora-a 22s ease-in-out infinite;
+}
+.ad-aurora i:nth-child(2) {
+  right: -20vmax;
+  top: 15vh;
+  background: #8a4b2a;
+  animation: ad-aurora-b 18s ease-in-out infinite;
+}
+.ad-aurora i:nth-child(3) {
+  bottom: -25vmax;
+  left: 20vw;
+  background: #cc4a00;
+  animation: ad-aurora-c 25s ease-in-out infinite;
+}
+@keyframes ad-aurora-a {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.15; }
+  50% { transform: translate(18vw, 14vh) scale(1.2); opacity: 0.25; }
+}
+@keyframes ad-aurora-b {
+  0%, 100% { transform: translate(0, 0) scale(1.1); opacity: 0.25; }
+  50% { transform: translate(-16vw, 12vh) scale(0.9); opacity: 0.15; }
+}
+@keyframes ad-aurora-c {
+  0%, 100% { transform: translate(0, 0) scale(0.95); opacity: 0.2; }
+  50% { transform: translate(-14vw, -16vh) scale(1.2); opacity: 0.15; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ad-aurora i { animation: none; }
+  .ad-flash { animation: none; border-color: var(--color-signal); }
 }

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { deleteEvent, fetchEvents, insertEvent, updateEvent } from '../lib/api'
 import { fromLocalInput, toLocalInput } from '../lib/datetime'
 import type { CampusEvent, EventType } from '../types'
+import { useEditFocus } from './useEditFocus'
 
 export interface EventDraft {
   name: string
@@ -49,6 +50,7 @@ export function useAdminEvents(enabled: boolean, themeCounts: Record<string, num
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [editingId, setEditingId] = useState<string | 'new' | null>(null)
+  useEditFocus(editingId)
   const [draft, setDraft] = useState<EventDraft>(EMPTY)
   const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)

@@ -2,6 +2,12 @@
 
 Última actualización: 2026-11-17, al cierre del día (Fase 10 hecha y en `main`). Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
 
+## Fase 11 (2026-11-19): pulido del admin ✅ (hecha, falta correr el SQL)
+
+- **Hook `useEditFocus`** ([src/hooks/useEditFocus.ts](../src/hooks/useEditFocus.ts)): al abrir Editar/Agregar en Canciones, Reglas, Eventos y Anuncios hace scroll suave al formulario, enfoca el primer campo y lo resalta (`ad-flash`); al guardar o cancelar regresa a la fila (`data-row-id`). Playlists no tiene formulario. Probado en localhost editando y cancelando en las 4 pestañas.
+- **Aurora** en `/admin` y su login (solo CSS, `.ad-aurora` en `admin.css`; estática con reduced-motion). Capturas en `docs/evidencias/fase11/`.
+- **Seed de 21 canciones pendiente de correr por el dueño** en el SQL Editor: [supabase/seed_canciones_extra.sql](../supabase/seed_canciones_extra.sql) (idempotente; el SELECT final debe dar 60). IDs verificados con oEmbed; ver notas del archivo (4 subidas por canales no oficiales; reguetón revisado).
+
 ## Dónde vamos
 
 **Fases 0 a 10 hechas, desplegadas y verificadas.** La Fase 10 ("requisitos faltantes" de la auditoría: reglas, playlists, respaldo, tableta, estadísticas y tarjeta "Siguiente") se probó en vivo con sesión de admin y se fusionó a `main` (commits `2a7f6a4` y `41b1d43`); Vercel en "success" y `/pantalla`, `/votar` y `/admin` responden 200 en producción. Producción: **https://radio-campus-five.vercel.app** (repo público: https://github.com/cesarau90/radio-campus).

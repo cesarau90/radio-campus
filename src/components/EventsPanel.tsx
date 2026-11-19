@@ -34,6 +34,7 @@ export default function EventsPanel({ events: ev, themes, nowMs }: Props) {
 
       {ev.editingId !== null && (
         <form
+          data-edit-form
           className="ad-group"
           onSubmit={(e) => {
             e.preventDefault()
@@ -94,7 +95,7 @@ export default function EventsPanel({ events: ev, themes, nowMs }: Props) {
               {ev.events.map((row) => {
                 const status = eventStatus(row, nowMs)
                 return (
-                  <tr key={row.id} className={status === 'terminado' ? 'is-off' : ''}>
+                  <tr key={row.id} data-row-id={row.id} className={status === 'terminado' ? 'is-off' : ''}>
                     <td>
                       <strong>{row.name}</strong>
                     </td>
