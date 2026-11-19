@@ -1,6 +1,6 @@
 # Arquitectura
 
-Radio Campus es una **SPA de React** sin servidor propio. El navegador habla directo con Supabase (Postgres, Auth, Realtime y funciones SQL) y con tres servicios gratuitos: YouTube (música), Open-Meteo (clima) y la Web Speech API del navegador (voz). **La lógica crítica está en el servidor**, en funciones SQL `security definer`; el cliente solo muestra y pide acciones.
+Radio Campus es una **SPA de React** sin servidor propio. El navegador habla directo con Supabase (Postgres, Auth, Realtime y funciones SQL) y con tres servicios gratuitos: YouTube (música), Open-Meteo (clima) y la voz: clips pregrabados de ElevenLabs (voz Kate) servidos como archivos estáticos, con la Web Speech API del navegador como respaldo. **La lógica crítica está en el servidor**, en funciones SQL `security definer`; el cliente solo muestra y pide acciones.
 
 ## Vista general
 
@@ -22,7 +22,7 @@ flowchart LR
 
   YT["YouTube IFrame API"]
   OM["Open-Meteo (clima)"]
-  WS["Web Speech API (voz)"]
+  WS["Voz: clips Kate + Web Speech API (respaldo)"]
 
   P -- "RPC" --> RPC
   V -- "RPC cast_vote" --> RPC
@@ -71,7 +71,7 @@ sequenceDiagram
   Note over TV,DB: al vencer ends_at (o por pg_cron)
   TV->>DB: close_round(ronda)
   DB-->>TV: ganadora (votos, empate o sin votos)
-  TV->>TV: voz: "Ronda cerrada. Sigue ..."
+  TV->>TV: voz (clips Kate; respaldo del navegador): "Ronda cerrada. Sigue ..."
   Note over TV: al terminar la canción en curso
   TV->>DB: next_announcement (si toca, se dice entre canciones)
   TV->>DB: record_play(ganadora) y start_round(...)
