@@ -15,11 +15,12 @@ export interface AnnouncementDraft {
   hour_from: string
   hour_to: string
   every_n_songs: string
+  audio_url: string
 }
 
 export type AnnouncementField = keyof AnnouncementDraft
 
-const EMPTY: AnnouncementDraft = { text: '', approved: false, active: true, starts: '', ends: '', hour_from: '', hour_to: '', every_n_songs: '3' }
+const EMPTY: AnnouncementDraft = { text: '', approved: false, active: true, starts: '', ends: '', hour_from: '', hour_to: '', every_n_songs: '3', audio_url: '' }
 
 const isHour = (v: string) => /^\d{1,2}$/.test(v.trim()) && Number(v) >= 0 && Number(v) <= 23
 
@@ -33,6 +34,8 @@ export function validateAnnouncement(d: AnnouncementDraft): Partial<Record<Annou
   if (hf && !isHour(hf)) e.hour_from = 'Una hora de 0 a 23.'
   if (ht && !isHour(ht)) e.hour_to = 'Una hora de 0 a 23.'
   if (!e.hour_from && !e.hour_to && !!hf !== !!ht) e.hour_to = 'Pon las dos horas o ninguna.'
+  const au = d.audio_url.trim()
+  if (au && !/^(\/|https?:\/\/)\S+$/.test(au)) e.audio_url = 'Una URL completa (https://…) o una ruta como /audio/anuncio.mp3.'
   const a = fromLocalInput(d.starts)
   const b = fromLocalInput(d.ends)
   if (d.starts && !a) e.starts = 'Fecha inválida.'
@@ -51,6 +54,7 @@ function toDraft(a: Announcement): AnnouncementDraft {
     hour_from: a.hour_from === null ? '' : String(a.hour_from),
     hour_to: a.hour_to === null ? '' : String(a.hour_to),
     every_n_songs: String(a.every_n_songs),
+    audio_url: a.audio_url ?? '',
   }
 }
 
@@ -64,6 +68,7 @@ function toInput(d: AnnouncementDraft): AnnouncementInput {
     hour_from: d.hour_from.trim() === '' ? null : Number(d.hour_from),
     hour_to: d.hour_to.trim() === '' ? null : Number(d.hour_to),
     every_n_songs: Number(d.every_n_songs),
+    audio_url: d.audio_url.trim() || null,
   }
 }
 

@@ -8,6 +8,8 @@ export interface Announcement {
   hour_from: number | null
   hour_to: number | null
   every_n_songs: number
+  /** MP3 opcional (URL completa o ruta /audio/x.mp3). Sin él se usa la voz del navegador. */
+  audio_url: string | null
   last_played_at: string | null
 }
 

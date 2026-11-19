@@ -1,3 +1,4 @@
+import { useAnnouncementAudio } from './useAnnouncementAudio'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   closeRound,
@@ -67,6 +68,8 @@ export function usePantalla() {
 
   const speech = useSpeech()
   const { speak } = speech
+  const annAudio = useAnnouncementAudio()
+  const { play: playAudio } = annAudio
   const player = useYouTubePlayer({
     videoId: nowSong?.youtube_id ?? null,
     startedAt: playback?.started_at ?? null,
@@ -74,7 +77,7 @@ export function usePantalla() {
     nowMs: clock.nowMs,
     ready: clock.ready && !live.loading,
     paused: settings?.paused ?? false,
-    duck: speech.speaking,
+    duck: speech.speaking || annAudio.playing,
     onError: handlePlayerError,
   })
   useEffect(() => {
@@ -157,7 +160,9 @@ export function usePantalla() {
             await markAnnouncementPlayed(ann.id) // primero se marca: si algo falla, no se repite en bucle
             await setPhase('announcement')
             setAnnouncement(ann.text)
-            await speak(ann.text)
+            // Con MP3 se reproduce el audio; si falla o no hay, habla la voz del navegador.
+            const played = ann.audio_url ? await playAudio(ann.audio_url) : false
+            if (!played) await speak(ann.text)
             setAnnouncement(null)
           }
           await recordPlay({ songId: s.round.winner_id, roundId: s.round.id })
@@ -177,7 +182,7 @@ export function usePantalla() {
     void step()
     const id = setInterval(() => void step(), STEP_MS)
     return () => clearInterval(id)
-  }, [speak]) // speak es estable: el director no se reinicia
+  }, [speak, playAudio]) // speak y playAudio son estables: el director no se reinicia
 
   // ---- qué se muestra ----
   const current = live.current
@@ -265,6 +270,7 @@ export function usePantalla() {
     unlockSound: () => {
       player.unlock()
       speech.unlock()
+      annAudio.unlock()
     },
     announcement,
     // /pantalla?debug=1 muestra el botón "Probar voz" (para revisar qué voz usa este navegador)

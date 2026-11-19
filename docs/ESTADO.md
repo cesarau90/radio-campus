@@ -2,7 +2,11 @@
 
 Última actualización: 2026-11-17, al cierre del día (Fase 10 hecha y en `main`). Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
 
-## Fase 11 (2026-11-19): pulido del admin ✅ (hecha, falta correr el SQL)
+## Fase 12 (2026-11-19): audio MP3 opcional en anuncios ✅
+
+- Migración `20261119000100_announcement_audio.sql` (`audio_url text`), ya corrida en Supabase. Admin → Anuncios: campo "Audio MP3 (opcional)" (URL o `/audio/x.mp3`), reproductor de prueba y chip "MP3". `/pantalla` reproduce el MP3 con la música atenuada (`useAnnouncementAudio`, topes de seguridad de 10 s para arrancar y duración + 5 s) y si falla o no hay, usa la voz del navegador. Los MP3 van en `public/audio/` (pendiente: meter el de ElevenLabs). Sin probar en vivo. ElevenLabs agregado a `docs/servicios-y-costos.md`.
+
+## Fase 11 (2026-11-19): pulido del admin ✅ (hecha, falta correr el SQL de las canciones)
 
 - **Hook `useEditFocus`** ([src/hooks/useEditFocus.ts](../src/hooks/useEditFocus.ts)): al abrir Editar/Agregar en Canciones, Reglas, Eventos y Anuncios hace scroll suave al formulario, enfoca el primer campo y lo resalta (`ad-flash`); al guardar o cancelar regresa a la fila (`data-row-id`). Playlists no tiene formulario. Probado en localhost editando y cancelando en las 4 pestañas.
 - **Aurora** en `/admin` y su login (solo CSS, `.ad-aurora` en `admin.css`; estática con reduced-motion). Capturas en `docs/evidencias/fase11/`.

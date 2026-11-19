@@ -67,6 +67,19 @@ export default function AnnouncementsPanel({ announcements: an, nowMs }: Props) 
             <TextField label="Empieza (opcional)" type="datetime-local" value={an.draft.starts} onChange={(v) => an.setField('starts', v)} error={an.errors.starts} />
             <TextField label="Termina (opcional)" type="datetime-local" value={an.draft.ends} onChange={(v) => an.setField('ends', v)} error={an.errors.ends} />
           </div>
+          <TextField
+            label="Audio MP3 (opcional)"
+            value={an.draft.audio_url}
+            onChange={(v) => an.setField('audio_url', v)}
+            error={an.errors.audio_url}
+            hint="URL completa o ruta como /audio/anuncio.mp3 (archivo en public/audio/). Sin audio se usa la voz del navegador."
+            mono
+          />
+          {an.draft.audio_url.trim() && !an.errors.audio_url && (
+            <audio controls preload="none" src={an.draft.audio_url.trim()} aria-label="Probar el MP3" style={{ width: '100%' }}>
+              Tu navegador no reproduce audio.
+            </audio>
+          )}
           <CheckField label="Aprobado" hint="Sin aprobar no sale al aire." checked={an.draft.approved} onChange={(v) => an.setField('approved', v)} />
           <CheckField label="Activo" hint="Apágalo para pausarlo sin borrarlo." checked={an.draft.active} onChange={(v) => an.setField('active', v)} />
           {an.formError && (
@@ -120,6 +133,7 @@ export default function AnnouncementsPanel({ announcements: an, nowMs }: Props) 
                     <td className="ad-hint">{schedule(a)}</td>
                     <td>
                       <span className={`ad-chip${status === 'al-aire' ? ' ad-chip--ok' : ''}`}>{STATUS_LABEL[status]}</span>
+                      {a.audio_url && <span className="ad-chip" title={a.audio_url}>MP3</span>}
                     </td>
                     <td className="mono ad-hint">{a.last_played_at ? formatDateTime(a.last_played_at) : 'Nunca'}</td>
                     <td>
