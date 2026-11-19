@@ -1,5 +1,9 @@
 # Estado del proyecto (para retomar)
 
+## Estado actual (2026-11-19)
+
+Fases 0–13 en `main` y desplegadas; todos los requisitos del documento están cubiertos. Lo único pendiente es la checklist "Antes de la demo" (más abajo).
+
 Última actualización: 2026-11-19 (Fase 13 en `main`; antes, Fase 10 el 2026-11-17). Plan completo: [superpowers/plans/2026-11-13-radio-campus.md](superpowers/plans/2026-11-13-radio-campus.md).
 
 ## Fase 13 (2026-11-19): voz pregrabada de ElevenLabs (voz Kate) en `/pantalla` ✅
@@ -54,6 +58,8 @@
 
 ## Auditoría contra los requisitos del profe (2026-11-17)
 
+> Histórico: todos los ❌ y ⚠️ de esta tabla se resolvieron en la Fase 10.
+
 ✅ cumple · ⚠️ a medias · ❌ falta.
 
 | # | Requisito | Estado | Dónde está / qué falta | Estimación |
@@ -74,6 +80,8 @@
 Total aproximado de lo que falta: 13–16 h. Orden sugerido: 1, 2 y 9 (los más claros frente al enunciado), luego 5, 4 y 3.
 
 ## Fase 10: requisitos faltantes ✅ (hecha; lo de abajo es el plan original)
+
+> Histórico: plan original, ya hecho y probado.
 
 **Resultado (2026-11-17):** Reglas, Playlists y Respaldo probados en vivo (regla restaurada a 2–4, respaldo regresado a `respaldo`, reimport sin duplicados: 7 reglas, 2 eventos, 1 anuncio, 2 playlists, 15 canciones antes y después); tableta a 768×1024 sin desborde en las 7 pestañas medidas y casillas de 44 px; estadísticas y tarjeta "Siguiente" en el Monitor; manual y README al día. Capturas en `docs/evidencias/fase10/`.
 
@@ -123,6 +131,8 @@ Versiones sencillas, reutilizando los componentes del admin. **Estado real del �
 - **Pendiente tuyo:** limpiar los datos de prueba (rondas, historial, votos).
 
 ## Voz de la radio (2026-11-17): una sola ruta, dos idiomas (ACTUALIZADO 2026-11-19: se probó Jorge, se quedó Dalia)
+
+> Desde la Fase 13, Dalia/Jenny (voz del navegador) son el **respaldo**; la voz principal de las rondas son los clips de ElevenLabs (voz Kate). Ver Fase 13.
 
 - **2026-11-19: se probó Jorge (es-MX) en Edge, pero se regresó a Dalia (mujer) porque suena mejor** (revert de `e41cec2`: `speech.ts`, `useSpeech.ts`, README y manual quedaron como antes). Azure Speech se descartó por riesgo antes de la demo; ElevenLabs/Antonio también se canceló (el soporte de MP3 por anuncio sigue en el código, opcional). La voz vigente es la que se describe abajo.
 
@@ -274,6 +284,7 @@ Checklist. Lo marcado **(Supabase)** lo hace el usuario en el panel o el SQL Edi
 
 **Supabase (a cargo del usuario)**
 
+- [ ] **Correr/verificar `supabase/seed_canciones_extra.sql`** en el SQL Editor (idempotente; el `SELECT` final debe dar **60** canciones).
 - [ ] **Subir el límite de inicios de sesión anónimos por IP** (*Authentication → Rate Limits*; por defecto 30 por hora). Si el campus comparte IP, subirlo y **anotar el valor usado** en el README ("Funciones simuladas o limitaciones"). Si la opción no aparece, es `rate_limit_anonymous_users` en la Management API. Para ensayar con celulares, usar datos móviles en algunos para variar la IP.
 - [ ] **Site URL** (*Authentication → URL Configuration*): `https://radio-campus-five.vercel.app`.
 - [ ] **Despertar el proyecto**: un proyecto gratuito se pausa tras ~7 días sin actividad; abrirlo el día anterior y comprobar que `/votar` conecta.
@@ -291,8 +302,11 @@ Checklist. Lo marcado **(Supabase)** lo hace el usuario en el panel o el SQL Edi
 
 **Equipo de la TV y celulares**
 
-- [ ] `npm run verify:seed` (39/39 videos) y `npm run smoke` (todo OK) el día anterior.
-- [ ] Abrir `/pantalla` en **Microsoft Edge**, pulsar **Activar sonido** y dejar **una sola** pantalla abierta (`/pantalla?debug=1` para probar la voz Dalia y la de inglés).
+- [ ] `npm run verify:seed` (39/39 videos, `seed.sql`) y `npm run smoke` (todo OK) el día anterior.
+- [ ] `node scripts/verify-youtube-ids.mjs supabase/seed_canciones_extra.sql` (21/21 videos) el día anterior.
+- [ ] **No abrir `/pantalla` antes de la demo** (escribe rondas e historial reales en la base).
+- [ ] Abrir `/pantalla` en **Microsoft Edge**, pulsar **Activar sonido** y dejar **una sola** pantalla abierta (`/pantalla?debug=1` para probar la voz de respaldo, Dalia, y la de inglés).
+- [ ] Probar **en producción** un anuncio con MP3 (`/audio/bienvenida_kate.mp3`) y una ronda con la voz Kate (con la base limpia después).
 - [ ] Comprobar que el **QR** apunta a `radio-campus-five.vercel.app/votar` (no a localhost) y que el recuadro mide 280 px o más.
 - [x] **Ronda real con celulares** en producción: hecha el 2026-11-17 (PC + iPhone con Safari, cierre con 2 votos); evidencias en `docs/evidencias/demo/`. Repetirla solo si se quiere mostrar con más dispositivos.
 - [ ] Mostrar el criterio de contexto: **Simular contexto** → escenarios → "Aplicar a la radio" → ver cambiar las opciones de la siguiente ronda → **Quitar simulación**.

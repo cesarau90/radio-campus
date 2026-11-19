@@ -62,7 +62,8 @@ Mensajes que la radio dice en voz alta **entre dos canciones** (nunca encima de 
 - **Cada cuántas canciones:** frecuencia mínima entre apariciones.
 - **Horario y fechas (opcionales):** una ventana de horas (puede cruzar la medianoche, p. ej. de 20 a 5) y fechas de inicio y fin.
 - **Aprobado y activo:** `/pantalla` **solo lee los anuncios aprobados y activos**. Un anuncio nuevo nace sin aprobar; usa **Aprobar** para publicarlo y **Apagar** para pausarlo sin borrarlo.
-- **Probar voz:** lo dice con la voz de la radio en tu navegador (con Microsoft Edge suenan las voces Natural).
+- **Audio MP3 (opcional):** URL o ruta tipo `/audio/bienvenida_kate.mp3` (los archivos van en `public/audio/`). Si hay MP3, `/pantalla` lo reproduce; si no hay o falla, lo dice la voz del navegador.
+- **Probar voz:** lo dice con la voz del navegador (el respaldo; con Microsoft Edge suenan las voces Natural como Dalia). No reproduce el MP3.
 
 Estados: *Sale al aire*, *Sin aprobar*, *Apagado* y *Fuera de fechas*.
 
@@ -119,7 +120,7 @@ La lista completa, con lo que se hace en Supabase, está en [ESTADO.md](ESTADO.m
 | Síntoma | Qué revisar |
 |---|---|
 | `/pantalla` no suena | Pulsar **Activar sonido** (el navegador bloquea el audio hasta un clic); comprobar que la radio no esté en pausa |
-| La voz suena distinta o de mujer | Abrir en **Microsoft Edge**; en otros navegadores se usa la voz del sistema |
+| La voz suena distinta o robótica | Las rondas usan clips pregrabados (voz Kate); si un clip falta o no arranca en 3 s entra la voz del navegador. Abrir en **Microsoft Edge** para que ese respaldo sea Dalia. Las canciones agregadas desde el admin no tienen clip |
 | Los celulares ven "No pudimos conectar" | Límite de inicios de sesión anónimos por IP en Supabase (*Authentication → Rate Limits*) |
 | Un video no suena | Está eliminado o no permite incrustarse: la radio lo salta y lo registra; desactívalo en Canciones |
 | Las opciones no cambian con el contexto | Hay una simulación activa (o no hay temperatura y se usa el respaldo); revisa el contexto de la ronda en el Monitor |
